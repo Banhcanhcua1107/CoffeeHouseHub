@@ -1,15 +1,17 @@
-"build": {
-  "builder": "NIXPACKS",
-  "nixpacksPlan": {
-    "phases": {
-      "install": {
-        "cmds": ["npm install --workspaces --include-workspace-root"]
-      },
-      "build": {
-        "cmds": ["npm run build || true"]
-      },
-      "start": {
-        "cmds": ["npm start --workspace backend"]
+{
+  "build": {
+    "builder": "NIXPACKS",
+    "nixpacksPlan": {
+      "phases": {
+        "install": {
+          "cmds": ["npm install --workspaces --include-workspace-root"]
+        },
+        "build": {
+          "cmds": ["npm run build || true"]
+        },
+        "start": {
+          "cmds": ["npm start --workspace backend"]
+        }
       }
     }
   }
