@@ -1,6 +1,7 @@
 {
   "name": "coffe_website",
   "private": true,
+  "workspaces": ["backend"],
   "version": "0.0.0",
   "type": "module",
   "scripts": {
