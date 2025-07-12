@@ -43,7 +43,7 @@ const upload = multer({ storage: cloudinaryStorage });
 const diskStorage = multer.diskStorage({
     destination: function (req, file, cb) {
         const uploadDir = 'uploads/';
-        if (!fs.existsSync(uploadDir)){
+        if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir);
         }
         cb(null, uploadDir)
@@ -81,10 +81,11 @@ let dbPool;
 async function initializeDatabase() {
     try {
         dbPool = mysql.createPool({
-            host: "localhost",
-            user: "root",
-            password: "1234",
-            database: "coffee_website",
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_DATABASE,
+            port: process.env.DB_PORT,
             waitForConnections: true,
             connectionLimit: 10,
             queueLimit: 0
@@ -128,7 +129,7 @@ app.get('/api/admin/revenue', async (req, res) => {
     const { year, month } = req.query;
 
     if (!year || !month) {
-      return res.status(400).json({ error: 'Year and month are required' });
+        return res.status(400).json({ error: 'Year and month are required' });
     }
 
     try {
@@ -166,14 +167,14 @@ app.get('/api/admin/revenue', async (req, res) => {
             totalMonthlyRevenue += parseFloat(order.dailyTotal);
         });
 
-        res.json({ 
-            dailyRevenue: dailyData, 
-            total: totalMonthlyRevenue 
+        res.json({
+            dailyRevenue: dailyData,
+            total: totalMonthlyRevenue
         });
 
     } catch (error) {
-      console.error('Error fetching revenue data:', error);
-      res.status(500).json({ error: 'Internal server error' });
+        console.error('Error fetching revenue data:', error);
+        res.status(500).json({ error: 'Internal server error' });
     }
 });
 
@@ -243,16 +244,16 @@ const createOrderInDb = async (orderData) => {
         const [orderResult] = await connection.query(
             'INSERT INTO orders (user_id, order_code, fullname, email, phone, address, note, total_amount, payment_method, payment_status, order_status, cancellation_reason) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
-                orderData.userId, 
-                orderData.orderCode, 
-                orderData.fullname, 
-                orderData.email, 
-                orderData.phone, 
-                orderData.address, 
-                orderData.note, 
-                orderData.amount, 
-                orderData.paymentMethod, 
-                orderData.paymentStatus || 'pending', 
+                orderData.userId,
+                orderData.orderCode,
+                orderData.fullname,
+                orderData.email,
+                orderData.phone,
+                orderData.address,
+                orderData.note,
+                orderData.amount,
+                orderData.paymentMethod,
+                orderData.paymentStatus || 'pending',
                 orderData.orderStatus || 'processing',
                 orderData.cancellationReason || null
             ]
@@ -277,7 +278,7 @@ const createOrderInDb = async (orderData) => {
         if (orderData.orderStatus !== 'cancelled' && orderData.userId) {
             await connection.query('DELETE FROM cart WHERE user_id = ?', [orderData.userId]);
         }
-        
+
         await connection.commit();
         return { success: true, orderId: newOrderId, orderCode: orderData.orderCode };
     } catch (error) {
@@ -298,9 +299,9 @@ app.use('/momo', momoPayment);
 
 // Order & Payment Routes
 app.get('/orders', authenticateJWT, adminOnly, async (req, res) => {
-  try {
-    const [orders] = await dbPool.query(
-      `SELECT o.*, oi.product_id, oi.product_type, oi.product_name, oi.quantity, oi.price,
+    try {
+        const [orders] = await dbPool.query(
+            `SELECT o.*, oi.product_id, oi.product_type, oi.product_name, oi.quantity, oi.price,
               CASE 
                 WHEN oi.product_type = 'product' THEN p.image
                 WHEN oi.product_type = 'cafe' THEN c.img
@@ -310,52 +311,52 @@ app.get('/orders', authenticateJWT, adminOnly, async (req, res) => {
        LEFT JOIN order_items oi ON o.id = oi.order_id
        LEFT JOIN products p ON oi.product_id = p.id AND oi.product_type = 'product'
        LEFT JOIN cafe c ON oi.product_id = c.id AND oi.product_type = 'cafe'`
-    );
+        );
 
-    // Nhóm các mục trong đơn hàng
-    const groupedOrders = [];
-    const orderMap = {};
+        // Nhóm các mục trong đơn hàng
+        const groupedOrders = [];
+        const orderMap = {};
 
-    for (const row of orders) {
-      if (!orderMap[row.id]) {
-        orderMap[row.id] = {
-          id: row.id,
-          order_code: row.order_code,
-          created_at: row.order_date,
-          fullname: row.fullname,
-          email: row.email,
-          phone: row.phone,
-          address: row.address,
-          payment_method: row.payment_method,
-          payment_status: row.payment_status,
-          order_status: row.order_status,
-          total_amount: row.total_amount,
-          items: [],
-        };
-        groupedOrders.push(orderMap[row.id]);
-      }
-      if (row.product_id) {
-        orderMap[row.id].items.push({
-          id: row.product_id,
-          product_name: row.product_name,
-          quantity: row.quantity,
-          price: row.price,
-          image: row.image,
-        });
-      }
+        for (const row of orders) {
+            if (!orderMap[row.id]) {
+                orderMap[row.id] = {
+                    id: row.id,
+                    order_code: row.order_code,
+                    created_at: row.order_date,
+                    fullname: row.fullname,
+                    email: row.email,
+                    phone: row.phone,
+                    address: row.address,
+                    payment_method: row.payment_method,
+                    payment_status: row.payment_status,
+                    order_status: row.order_status,
+                    total_amount: row.total_amount,
+                    items: [],
+                };
+                groupedOrders.push(orderMap[row.id]);
+            }
+            if (row.product_id) {
+                orderMap[row.id].items.push({
+                    id: row.product_id,
+                    product_name: row.product_name,
+                    quantity: row.quantity,
+                    price: row.price,
+                    image: row.image,
+                });
+            }
+        }
+
+        res.json(groupedOrders);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-
-    res.json(groupedOrders);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 });
 
 app.post('/orders/create-cod', authenticateJWT, async (req, res) => {
     try {
         const userId = req.user.id;
         const { orderCode, fullname, email, phone, address, note, amount, cart } = req.body;
-        
+
         const result = await createOrderInDb({
             userId, orderCode, fullname, email, phone, address, note,
             amount: Number(amount),
@@ -364,7 +365,7 @@ app.post('/orders/create-cod', authenticateJWT, async (req, res) => {
             orderStatus: 'processing',
             cart
         });
-        
+
         await createNotification(userId, `Bạn đã đặt thành công đơn hàng #${result.orderCode}.`, `/don-hang/${result.orderCode}`);
         await sendReceiptEmail({
             to: email, orderId: result.orderCode, amount: Number(amount),
@@ -375,9 +376,9 @@ app.post('/orders/create-cod', authenticateJWT, async (req, res) => {
         // =============================================================
         // THAY ĐỔI Ở ĐÂY: Trả về thêm orderCode
         // =============================================================
-        res.status(201).json({ 
-            success: true, 
-            message: 'Đặt hàng COD thành công.', 
+        res.status(201).json({
+            success: true,
+            message: 'Đặt hàng COD thành công.',
             orderId: result.orderId,
             orderCode: result.orderCode // Thêm dòng này
         });
@@ -394,7 +395,7 @@ app.get('/order/:orderCode', authenticateJWT, async (req, res) => {
     try {
         // 1. Lấy thông tin cơ bản của đơn hàng
         const [[order]] = await dbPool.query('SELECT * FROM orders WHERE order_code = ?', [orderCode]);
-        
+
         // 2. Kiểm tra xem đơn hàng có tồn tại không
         if (!order) {
             console.log(`[404] Không tìm thấy đơn hàng với code: ${orderCode}`); // Thêm log để debug
@@ -435,7 +436,7 @@ app.get('/order/:orderCode', authenticateJWT, async (req, res) => {
 app.put('/orders/:id/status', authenticateJWT, adminOnly, async (req, res) => {
     const { id } = req.params;
     // Thêm cancellation_reason vào body
-    const { order_status, payment_status, cancellation_reason } = req.body; 
+    const { order_status, payment_status, cancellation_reason } = req.body;
 
     if (!order_status && !payment_status) {
         return res.status(400).json({ error: 'Không có trạng thái nào được cung cấp để cập nhật.' });
@@ -450,17 +451,17 @@ app.put('/orders/:id/status', authenticateJWT, adminOnly, async (req, res) => {
 
         let sql = 'UPDATE orders SET ';
         const params = [];
-        
+
         if (order_status) {
             sql += 'order_status = ? ';
             params.push(order_status);
         }
-        
+
         if (payment_status) {
             sql += (params.length > 0 ? ', ' : '') + 'payment_status = ? ';
             params.push(payment_status);
         }
-        
+
         // Logic cho việc hủy đơn
         if (order_status === 'cancelled') {
             const reason = cancellation_reason || 'Bị hủy bởi quản trị viên.';
@@ -479,9 +480,9 @@ app.put('/orders/:id/status', authenticateJWT, adminOnly, async (req, res) => {
                 `/don-hang/${order.order_code}`
             );
         } else if (order_status) { // Gửi thông báo cho các trạng thái khác
-             await createNotification(
-                order.user_id, 
-                `Trạng thái đơn hàng #${order.order_code} đã được cập nhật thành: ${order_status}.`, 
+            await createNotification(
+                order.user_id,
+                `Trạng thái đơn hàng #${order.order_code} đã được cập nhật thành: ${order_status}.`,
                 `/don-hang/${order.order_code}`
             );
         }
@@ -489,13 +490,13 @@ app.put('/orders/:id/status', authenticateJWT, adminOnly, async (req, res) => {
 
         sql += 'WHERE id = ?';
         params.push(id);
-        
+
         const [result] = await dbPool.query(sql, params);
-        
+
         if (result.affectedRows === 0) {
             return res.status(404).json({ error: 'Không tìm thấy đơn hàng để cập nhật.' });
         }
-        
+
         res.json({ success: true, message: 'Đã cập nhật trạng thái đơn hàng thành công.' });
     } catch (error) {
         console.error("Lỗi khi cập nhật trạng thái đơn hàng:", error);
@@ -534,10 +535,10 @@ app.post('/momo/verify-and-send-mail', async (req, res) => {
                 cancellationReason: reason,   // Lý do hủy
                 cart: customerInfo.cart       // Vẫn truyền cart để log nếu cần, nhưng sẽ không insert items
             };
-            
+
             // Tạo một bản ghi đơn hàng "hủy" trong DB
             await createOrderInDb(failedOrderData);
-            
+
             // Gửi thông báo cho người dùng
             if (customerInfo.userId) {
                 await createNotification(customerInfo.userId, `Đơn hàng #${orderId} đã bị hủy do thanh toán không thành công.`, `/don-hang/${orderId}`);
@@ -546,7 +547,7 @@ app.post('/momo/verify-and-send-mail', async (req, res) => {
             // Trả về lỗi cho frontend để hiển thị trang thất bại
             return res.status(400).json({ success: false, error: message });
         }
-        
+
         // Xử lý khi giao dịch thành công
         const successfulOrderData = {
             userId: customerInfo.userId,
@@ -562,7 +563,7 @@ app.post('/momo/verify-and-send-mail', async (req, res) => {
             orderStatus: 'processing',     // Trạng thái đơn hàng đang xử lý
             cart: customerInfo.cart
         };
-        
+
         // Tạo đơn hàng thành công trong DB
         const result = await createOrderInDb(successfulOrderData);
 
@@ -578,7 +579,7 @@ app.post('/momo/verify-and-send-mail', async (req, res) => {
             phone: customerInfo.phone,
             address: customerInfo.address
         });
-        
+
         console.log(`[SUCCESS] Đã xử lý thành công đơn hàng mới ${orderId}.`);
         return res.json({ success: true, message: 'Đã tạo đơn hàng và gửi email thành công.' });
 
@@ -616,11 +617,11 @@ app.post("/login", async (req, res) => {
         const sql = 'SELECT id, username, email, password, role, fullname FROM users WHERE email = ?';
         const [results] = await dbPool.query(sql, [email]);
         if (results.length === 0) return res.status(401).json({ error: 'Invalid email or password' });
-        
+
         const user = results[0];
         const match = await bcrypt.compare(password, user.password);
         if (!match) return res.status(401).json({ error: 'Invalid email or password' });
-        
+
         const token = jwt.sign({ id: user.id, username: user.username, role: user.role }, jwtSecret, { expiresIn: '1h' });
         res.json({
             message: 'Login successful',
@@ -675,7 +676,7 @@ app.put('/api/admin/users/:id/role', authenticateJWT, adminOnly, async (req, res
     const { role } = req.body;
 
     // Ngăn admin tự thay đổi vai trò của chính mình
-    if (targetUserId == adminUserId) { 
+    if (targetUserId == adminUserId) {
         return res.status(403).json({ error: 'Bạn không thể thay đổi vai trò của chính mình.' });
     }
 
@@ -718,7 +719,7 @@ app.post("/cafes", authenticateJWT, adminOnly, upload.single('img'), async (req,
         if (!name || !price || !req.file) {
             return res.status(400).json({ error: "Thiếu thông tin tên, giá, hoặc hình ảnh." });
         }
-        
+
         // Lấy URL từ Cloudinary
         const imageUrl = req.file.path;
 
@@ -777,23 +778,23 @@ app.get("/products", async (req, res) => {
 app.post("/products", authenticateJWT, adminOnly, upload.single('image'), async (req, res) => {
     try {
         // Lấy tất cả các trường từ req.body
-        const { 
-            name, 
-            price, 
-            original, 
-            description, 
-            sale, 
-            short_description, 
-            sku, 
-            category, 
-            tags 
+        const {
+            name,
+            price,
+            original,
+            description,
+            sale,
+            short_description,
+            sku,
+            category,
+            tags
         } = req.body;
 
         // Kiểm tra các trường bắt buộc
         if (!name || !price || !req.file) {
             return res.status(400).json({ error: "Thiếu thông tin tên, giá, hoặc hình ảnh." });
         }
-        
+
         const imageUrl = req.file.path; // URL từ Cloudinary
         const isSale = sale === 'true' ? 1 : 0; // Chuyển đổi giá trị 'true'/'false' thành 1/0
 
@@ -803,14 +804,14 @@ app.post("/products", authenticateJWT, adminOnly, upload.single('image'), async 
             (name, price, original, description, image, sale, short_description, sku, category, tags) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-        
+
         // Mảng các giá trị tương ứng với các dấu '?'
         const values = [
-            name, 
-            price, 
-            original || null, 
-            description, 
-            imageUrl, 
+            name,
+            price,
+            original || null,
+            description,
+            imageUrl,
             isSale,
             short_description || null,
             sku || null,
@@ -819,7 +820,7 @@ app.post("/products", authenticateJWT, adminOnly, upload.single('image'), async 
         ];
 
         const [result] = await dbPool.query(sql, values);
-        
+
         res.status(201).json({ message: "Đã thêm sản phẩm mới", id: result.insertId });
     } catch (err) {
         console.error("Lỗi khi thêm sản phẩm:", err);
@@ -863,7 +864,7 @@ app.post("/products/import", authenticateJWT, adminOnly, uploadCsv.single('file'
                         (name, price, original, description, image, sale, short_description, sku, category, tags) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     `;
-                    
+
                     // Vì không thể upload ảnh qua CSV, ta dùng 1 ảnh placeholder
                     // Admin sẽ vào sửa ảnh sau nếu cần
                     const placeholderImage = 'https://res.cloudinary.com/dzug6i8vq/image/upload/v1719920194/coffee_house/placeholder_product_image.png';
@@ -888,8 +889,8 @@ app.post("/products/import", authenticateJWT, adminOnly, uploadCsv.single('file'
                 }
 
                 await connection.commit();
-                res.json({ 
-                    success: true, 
+                res.json({
+                    success: true,
                     message: `Hoàn tất! Đã nhập thành công ${processedCount} sản phẩm.`,
                     errors: errors
                 });
@@ -901,7 +902,7 @@ app.post("/products/import", authenticateJWT, adminOnly, uploadCsv.single('file'
             } finally {
                 connection.release();
                 // Xóa file tạm sau khi xử lý xong
-                fs.unlinkSync(filePath); 
+                fs.unlinkSync(filePath);
             }
         });
 });
@@ -925,7 +926,7 @@ app.put("/products/:id", authenticateJWT, adminOnly, upload.single('image'), asy
     if (req.file) { // Nếu có ảnh mới
         imageUrl = req.file.path;
     }
-    
+
     const isSale = sale === 'true' || sale === '1' ? 1 : 0;
 
     try {
@@ -959,17 +960,17 @@ app.post("/cart/add", authenticateJWT, async (req, res) => {
     try {
         const { productId, type, quantity = 1, image } = req.body;
         const userId = req.user.id;
-        
+
         const table = type === 'cafe' ? 'cafe' : 'products';
         const [results] = await dbPool.query(`SELECT id, name, price, ${type === 'cafe' ? 'img' : 'image'} as image FROM ${table} WHERE id = ?`, [productId]);
         if (results.length === 0) return res.status(404).json({ error: "Không tìm thấy sản phẩm" });
 
-        const condition = type === 'cafe' 
-            ? 'id_cafe = ? AND type = "cafe" AND user_id = ?' 
+        const condition = type === 'cafe'
+            ? 'id_cafe = ? AND type = "cafe" AND user_id = ?'
             : 'id_product = ? AND type = "product" AND user_id = ?';
-        
+
         const [cartResults] = await dbPool.query(`SELECT cartid, quantity FROM cart WHERE ${condition}`, [productId, userId]);
-        
+
         if (cartResults.length > 0) {
             const newQuantity = cartResults[0].quantity + quantity;
             await dbPool.query(`UPDATE cart SET quantity = ? WHERE cartid = ?`, [newQuantity, cartResults[0].cartid]);
@@ -1045,7 +1046,7 @@ app.post("/request-password-reset", async (req, res) => {
 
         await dbPool.query('UPDATE users SET reset_code = ?, reset_code_expires = ? WHERE email = ?', [resetCode, expiresAt, email]);
         console.log(`[2] Đã tạo mã reset (${resetCode}) và lưu vào DB cho ${email}`);
-        
+
         const mailOptions = {
             from: `"Coffee House" <${process.env.EMAIL_USER}>`,
             to: email,
@@ -1085,7 +1086,7 @@ app.post("/request-password-reset", async (req, res) => {
         // Log lỗi chi tiết ra terminal để debug
         console.error("!!!!!!!!!!!! LỖI CHI TIẾT TRONG /request-password-reset !!!!!!!!!!!!");
         console.error(err);
-        
+
         // Trả về một lỗi chung chung hơn cho phía client
         res.status(500).json({ error: 'Lỗi hệ thống khi gửi email. Vui lòng kiểm tra log server.' });
     }
@@ -1107,7 +1108,7 @@ app.post("/verify-reset-code", async (req, res) => {
 app.post("/reset-password", async (req, res) => {
     const { email, code, newPassword } = req.body;
     if (!email || !code || !newPassword) return res.status(400).json({ error: 'All fields are required' });
-    
+
     try {
         const checkSql = 'SELECT id FROM users WHERE email = ? AND reset_code = ? AND reset_code_expires > NOW()';
         const [results] = await dbPool.query(checkSql, [email, code]);
@@ -1116,7 +1117,7 @@ app.post("/reset-password", async (req, res) => {
         const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
         const updateSql = 'UPDATE users SET password = ?, reset_code = NULL, reset_code_expires = NULL WHERE email = ?';
         await dbPool.query(updateSql, [hashedPassword, email]);
-        
+
         res.json({ message: 'Password has been reset successfully' });
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -1125,24 +1126,24 @@ app.post("/reset-password", async (req, res) => {
 
 // Contact & News Routes
 app.post('/contact/send', async (req, res) => {
-  try {
-    const { name, email, message } = req.body;
-    if (!name || !email || !message) {
-      return res.status(400).json({ error: 'Vui lòng nhập đầy đủ thông tin.' });
-    }
+    try {
+        const { name, email, message } = req.body;
+        if (!name || !email || !message) {
+            return res.status(400).json({ error: 'Vui lòng nhập đầy đủ thông tin.' });
+        }
 
-    // 1. Lưu liên hệ vào database
-    await dbPool.query(
-      'INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)',
-      [name, email, message]
-    );
+        // 1. Lưu liên hệ vào database
+        await dbPool.query(
+            'INSERT INTO contacts (name, email, message) VALUES (?, ?, ?)',
+            [name, email, message]
+        );
 
-    // 2. Gửi email xác nhận cho khách hàng
-    const customerMailOptions = {
-      from: `"Coffee House" <${process.env.EMAIL_USER}>`,
-      to: email,
-      subject: 'Cảm ơn bạn đã liên hệ với Coffee House',
-      html: `
+        // 2. Gửi email xác nhận cho khách hàng
+        const customerMailOptions = {
+            from: `"Coffee House" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: 'Cảm ơn bạn đã liên hệ với Coffee House',
+            html: `
         <div style="font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f5f0e6; padding: 40px 0;">
           <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
             <!-- Header -->
@@ -1178,14 +1179,14 @@ app.post('/contact/send', async (req, res) => {
           </div>
         </div>
       `
-    };
+        };
 
-    // 3. Gửi email thông báo cho admin
-    const adminMailOptions = {
-      from: `"Khách hàng Coffee House" <${email}>`,
-      to: process.env.EMAIL_USER,
-      subject: `[Coffee House] Liên hệ mới từ ${name}`,
-      html: `
+        // 3. Gửi email thông báo cho admin
+        const adminMailOptions = {
+            from: `"Khách hàng Coffee House" <${email}>`,
+            to: process.env.EMAIL_USER,
+            subject: `[Coffee House] Liên hệ mới từ ${name}`,
+            html: `
         <div style="font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #f5f0e6; padding: 40px 0;">
           <div style="max-width: 600px; margin: auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 5px 20px rgba(0,0,0,0.05);">
             <!-- Header -->
@@ -1215,19 +1216,19 @@ app.post('/contact/send', async (req, res) => {
           </div>
         </div>
       `
-    };
+        };
 
-    // Gửi cả 2 email
-    await Promise.all([
-      transporter.sendMail(customerMailOptions),
-      transporter.sendMail(adminMailOptions)
-    ]);
+        // Gửi cả 2 email
+        await Promise.all([
+            transporter.sendMail(customerMailOptions),
+            transporter.sendMail(adminMailOptions)
+        ]);
 
-    res.json({ success: true, message: 'Đã gửi liên hệ thành công. Chúng tôi sẽ phản hồi sớm nhất!' });
-  } catch (err) {
-    console.error('Gửi liên hệ thất bại:', err);
-    res.status(500).json({ error: 'Lỗi hệ thống khi gửi liên hệ.' });
-  }
+        res.json({ success: true, message: 'Đã gửi liên hệ thành công. Chúng tôi sẽ phản hồi sớm nhất!' });
+    } catch (err) {
+        console.error('Gửi liên hệ thất bại:', err);
+        res.status(500).json({ error: 'Lỗi hệ thống khi gửi liên hệ.' });
+    }
 });
 
 app.get('/contacts', authenticateJWT, adminOnly, async (req, res) => {
@@ -1254,13 +1255,13 @@ app.put('/contacts/:id/reply', authenticateJWT, adminOnly, async (req, res) => {
         if (!contact) {
             return res.status(404).json({ error: 'Không tìm thấy liên hệ.' });
         }
-        
+
         // 2. Cập nhật database
         await dbPool.query(
             'UPDATE contacts SET admin_reply = ?, status = "replied", replied_at = NOW() WHERE id = ?',
             [admin_reply, id]
         );
-        
+
         // 3. Gửi email phản hồi cho người dùng
         const mailOptionsToUser = {
             from: `"Coffee House Support" <${process.env.EMAIL_USER}>`,
@@ -1320,10 +1321,10 @@ app.put('/contacts/:id/reply', authenticateJWT, adminOnly, async (req, res) => {
 app.put('/contacts/:id/status', authenticateJWT, adminOnly, async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
-     try {
+    try {
         await dbPool.query('UPDATE contacts SET status = ? WHERE id = ? AND status != "replied"', [status, id]);
         res.json({ success: true });
-    } catch(err) {
+    } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
@@ -1372,7 +1373,7 @@ app.post("/notifications/:id/mark-one-read", authenticateJWT, async (req, res) =
             "UPDATE notifications SET is_read = 1 WHERE id = ? AND user_id = ?",
             [id, userId]
         );
-        
+
         if (result.affectedRows > 0) {
             res.json({ success: true, message: "Đã đánh dấu thông báo là đã đọc." });
         } else {

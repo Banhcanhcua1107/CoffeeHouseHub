@@ -41,10 +41,14 @@ async function generateOrders() {
     try {
         console.log("Đang kết nối đến cơ sở dữ liệu...");
         connection = await mysql.createConnection({
-            host: "localhost",
-            user: "root",
-            password: "1234",
-            database: "coffee_website"
+            host: process.env.DB_HOST,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_DATABASE,
+            port: process.env.DB_PORT,
+            waitForConnections: true,
+            connectionLimit: 10,
+            queueLimit: 0
         });
         console.log("✅ Kết nối thành công!");
 
@@ -72,7 +76,7 @@ async function generateOrders() {
         for (let day = 1; day <= daysInMonth; day++) {
             const currentDate = new Date(TARGET_YEAR, TARGET_MONTH - 1, day);
             const numberOfOrdersForDay = randomInt(ORDERS_PER_DAY_MIN, ORDERS_PER_DAY_MAX);
-            
+
             console.log(`\n--- Ngày ${day}/${TARGET_MONTH}/${TARGET_YEAR}: Tạo ${numberOfOrdersForDay} đơn hàng ---`);
 
             // Tạo số lượng đơn hàng ngẫu nhiên cho ngày này
@@ -90,20 +94,25 @@ async function generateOrders() {
 
                 const orderDate = randomTimeInDay(currentDate); // Thời gian ngẫu nhiên trong ngày
                 const orderCode = `FAKE-${orderDate.getTime()}-${randomInt(100, 999)}`;
-                
+
                 // Quyết định trạng thái đơn hàng
                 const rand = Math.random();
                 let cumulative = 0;
                 let orderStatus = 'processing';
                 let paymentStatus = 'pending';
                 let paymentMethod = 'cod';
-                
+
                 cumulative += STATUS_DISTRIBUTION.delivered_paid;
-                if (rand < cumulative) { orderStatus = 'delivered'; paymentStatus = 'paid'; paymentMethod = Math.random() < 0.5 ? 'cod' : 'momo';
-                } else { cumulative += STATUS_DISTRIBUTION.processing_paid;
-                    if (rand < cumulative) { orderStatus = 'processing'; paymentStatus = 'paid'; paymentMethod = 'momo';
-                    } else { cumulative += STATUS_DISTRIBUTION.cancelled;
-                        if(rand < cumulative) { orderStatus = 'cancelled'; paymentStatus = 'pending'; paymentMethod = 'cod';
+                if (rand < cumulative) {
+                    orderStatus = 'delivered'; paymentStatus = 'paid'; paymentMethod = Math.random() < 0.5 ? 'cod' : 'momo';
+                } else {
+                    cumulative += STATUS_DISTRIBUTION.processing_paid;
+                    if (rand < cumulative) {
+                        orderStatus = 'processing'; paymentStatus = 'paid'; paymentMethod = 'momo';
+                    } else {
+                        cumulative += STATUS_DISTRIBUTION.cancelled;
+                        if (rand < cumulative) {
+                            orderStatus = 'cancelled'; paymentStatus = 'pending'; paymentMethod = 'cod';
                         } else { orderStatus = 'processing'; paymentStatus = 'pending'; paymentMethod = 'cod'; }
                     }
                 }
@@ -114,7 +123,7 @@ async function generateOrders() {
                         `INSERT INTO orders (user_id, order_code, fullname, email, phone, address, total_amount, payment_method, payment_status, order_status, order_date)
                          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
                         [
-                            user.id, orderCode, user.fullname, user.email, 
+                            user.id, orderCode, user.fullname, user.email,
                             '0987654321', '123 Đường Demo, P. ABC, Q. XYZ, TP.HCM',
                             totalAmount, paymentMethod, paymentStatus, orderStatus, orderDate
                         ]
@@ -136,7 +145,7 @@ async function generateOrders() {
                 }
             }
         }
-        
+
         console.log(`\n\n✅ HOÀN TẤT! Đã tạo xong dữ liệu cho tháng ${TARGET_MONTH}/${TARGET_YEAR}.`);
 
     } catch (err) {

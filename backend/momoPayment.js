@@ -1,15 +1,14 @@
-// --- START OF FILE momoPayment.js ---
-
 const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const axios = require('axios');
+require('dotenv').config();
 
-const partnerCode = 'MOMO';
-const accessKey = 'F8BBA842ECF85';
-const secretKey = 'K951B6PE1waDMi640xX08PD3vg6EkVlz';
-const redirectUrl = 'http://localhost:5173/checkout/momo-return';
-const ipnUrl = 'http://localhost:3000/momo/ipn'; // BE
+const partnerCode = process.env.MOMO_PARTNER_CODE;
+const accessKey = process.env.MOMO_ACCESS_KEY;
+const secretKey = process.env.MOMO_SECRET_KEY;
+const redirectUrl = process.env.MOMO_REDIRECT_URL;
+const ipnUrl = process.env.MOMO_IPN_URL;
 const requestType = 'captureWallet';
 
 const { sendReceiptEmail } = require('./sendMailHelper');
