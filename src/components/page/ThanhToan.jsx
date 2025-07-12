@@ -113,7 +113,7 @@ function Checkout() {
 
     try {
       if (formData.paymentMethod === 'cod') {
-        const paymentResponse = await fetch('http://localhost:3000/orders/create-cod', {
+        const paymentResponse = await fetch('https://coffee-backend.up.railway.app/orders/create-cod', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
           body: JSON.stringify({ ...commonOrderData, orderCode, paymentMethod: 'cod' }),
@@ -136,7 +136,7 @@ function Checkout() {
         });
 
       } else if (formData.paymentMethod === 'momo') {
-        const paymentResponse = await fetch('http://localhost:3000/momo/create', {
+        const paymentResponse = await fetch('https://coffee-backend.up.railway.app/momo/create', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ ...commonOrderData, orderId: orderCode, orderInfo: `Thanh toán đơn hàng CoffeeHouse #${orderCode}`, userId: user.id }),

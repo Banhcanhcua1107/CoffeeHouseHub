@@ -26,7 +26,7 @@ const UserOrderDetail = () => {
     // Không reset loading ở đây để tránh giật màn hình khi admin cập nhật
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/order/${orderCode}`, {
+      const res = await fetch(`https://coffee-backend.up.railway.app/order/${orderCode}`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await res.json();
@@ -65,7 +65,7 @@ const UserOrderDetail = () => {
     setIsUpdating(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/orders/${order.id}/status`, {
+      const res = await fetch(`https://coffee-backend.up.railway.app/orders/${order.id}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ [field]: value, ...extraData })
@@ -111,7 +111,7 @@ const UserOrderDetail = () => {
         setIsUpdating(true);
         try {
           const token = localStorage.getItem('token');
-          const res = await fetch(`http://localhost:3000/orders/user-cancel/${order.id}`, {
+          const res = await fetch(`https://coffee-backend.up.railway.app/orders/user-cancel/${order.id}`, {
             method: 'PUT',
             headers: { 'Authorization': `Bearer ${token}` },
           });

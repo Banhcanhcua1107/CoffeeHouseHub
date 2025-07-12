@@ -1,5 +1,8 @@
 import React, { createContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
+
+// Đặt URL backend Railway ở đây (dùng HTTPS, KHÔNG có port để tránh lỗi SSL)
+const API_BASE_URL = 'https://coffee-backend.up.railway.app';
 import { message } from 'antd'; // Sử dụng message của antd để thông báo đẹp hơn
 
 export const ShopContext = createContext(null);
@@ -46,7 +49,7 @@ export const ShopProvider = ({ children }) => {
     setIsAuthLoading(true);
     if (token) {
       try {
-        const res = await axios.get('http://localhost:3000/user', {
+        const res = await axios.get(`${API_BASE_URL}/user`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         updateUser(res.data);
@@ -71,13 +74,13 @@ export const ShopProvider = ({ children }) => {
   // =================================================================
 
   const fetchProducts = useCallback(() => {
-    axios.get("http://localhost:3000/products")
+    axios.get(`${API_BASE_URL}/products`)
       .then((res) => setProducts(res.data))
       .catch((err) => console.error("Lỗi khi tải sản phẩm:", err));
   }, []);
 
   const fetchCafes = useCallback(() => {
-    axios.get("http://localhost:3000/cafe")
+    axios.get(`${API_BASE_URL}/cafe`)
       .then((res) => setCafes(res.data))
       .catch((err) => console.error("Lỗi khi tải menu cafe:", err));
   }, []);
@@ -87,7 +90,7 @@ export const ShopProvider = ({ children }) => {
     if (!token) return;
 
     try {
-        const res = await axios.get("http://localhost:3000/cart/select", {
+        const res = await axios.get(`${API_BASE_URL}/cart/select`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setCart(res.data);
@@ -104,7 +107,7 @@ export const ShopProvider = ({ children }) => {
     if (!token) return;
     
     try {
-        const res = await axios.get("http://localhost:3000/notifications", {
+        const res = await axios.get(`${API_BASE_URL}/notifications`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setNotifications(res.data);
@@ -140,7 +143,7 @@ export const ShopProvider = ({ children }) => {
       return;
     }
     
-    axios.post("http://localhost:3000/cart/add", { productId, type, quantity, image }, { 
+    axios.post(`${API_BASE_URL}/cart/add`, { productId, type, quantity, image }, { 
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(() => {
@@ -156,7 +159,7 @@ export const ShopProvider = ({ children }) => {
       removeFromCart(cartId);
       return;
     }
-    axios.put(`http://localhost:3000/cart/${cartId}`, { quantity }, { 
+    axios.put(`${API_BASE_URL}/cart/${cartId}`, { quantity }, { 
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(() => fetchCart())
@@ -165,7 +168,7 @@ export const ShopProvider = ({ children }) => {
 
   const removeFromCart = (cartId) => {
     const token = localStorage.getItem('token');
-    axios.delete(`http://localhost:3000/cart/${cartId}`, { 
+    axios.delete(`${API_BASE_URL}/cart/${cartId}`, { 
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(() => {
@@ -182,7 +185,7 @@ export const ShopProvider = ({ children }) => {
 
     // Gọi API nền
     const token = localStorage.getItem('token');
-    axios.post('http://localhost:3000/notifications/mark-read', {}, {
+    axios.post(`${API_BASE_URL}/notifications/mark-read`, {}, {
       headers: { Authorization: `Bearer ${token}` }
     }).catch(err => {
         console.error("Lỗi khi đánh dấu đã đọc:", err);
@@ -203,7 +206,7 @@ export const ShopProvider = ({ children }) => {
 
     // Gọi API nền
     const token = localStorage.getItem('token');
-    axios.post(`http://localhost:3000/notifications/${notificationId}/mark-one-read`, {}, {
+    axios.post(`${API_BASE_URL}/notifications/${notificationId}/mark-one-read`, {}, {
         headers: { Authorization: `Bearer ${token}` }
     }).catch(err => {
         console.error("Lỗi khi đánh dấu 1 thông báo đã đọc:", err);

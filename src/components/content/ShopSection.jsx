@@ -13,7 +13,7 @@ function ShopSection() {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3000/products")
+    axios.get("https://coffee-backend.up.railway.app/products")
       // .slice(0, 4) đã giới hạn sẵn chỉ lấy 4 sản phẩm
       .then(res => setItems(res.data.slice(0, 4)))
       .catch(err => console.error("Lỗi API:", err));

@@ -42,7 +42,7 @@ function Menu() {
     formData.append('img', fileList[0].originFileObj);
     const token = localStorage.getItem('token');
     try {
-      await axios.post('http://localhost:3000/cafes', formData, { headers: { 'Authorization': `Bearer ${token}` } });
+      await axios.post('https://coffee-backend.up.railway.app/cafes', formData, { headers: { 'Authorization': `Bearer ${token}` } });
       message.success('Thêm món thành công!');
       setIsAddModalVisible(false);
       addForm.resetFields();
@@ -66,7 +66,7 @@ function Menu() {
     }
     const token = localStorage.getItem('token');
     try {
-      await axios.put(`http://localhost:3000/cafes/${editingItem.id}`, formData, { headers: { 'Authorization': `Bearer ${token}` } });
+      await axios.put(`https://coffee-backend.up.railway.app/cafes/${editingItem.id}`, formData, { headers: { 'Authorization': `Bearer ${token}` } });
       message.success('Cập nhật món thành công!');
       setIsEditModalVisible(false);
       setEditingItem(null);
@@ -80,7 +80,7 @@ function Menu() {
   const handleDeleteMenuItem = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      await axios.delete(`http://localhost:3000/cafes/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      await axios.delete(`https://coffee-backend.up.railway.app/cafes/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
       message.success('Xóa món thành công!');
       setIsEditModalVisible(false); // Đóng modal sau khi xóa
       if (fetchCafes) fetchCafes();

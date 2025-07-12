@@ -66,7 +66,7 @@ function Checkout() {
             fetchCart();
             navigate('/cam-on');
         } else if (formData.paymentMethod === 'momo') {
-            const res = await fetch('http://localhost:3000/momo/create', {
+            const res = await fetch('https://coffee-backend.up.railway.app/momo/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
@@ -78,7 +78,7 @@ function Checkout() {
             if (data.payUrl) window.location.href = data.payUrl;
             else alert('Không thể tạo thanh toán MoMo.');
         } else if (formData.paymentMethod === 'vnpay') {
-            const res = await fetch('http://localhost:3000/vnpay/create_payment_url', {
+            const res = await fetch('https://coffee-backend.up.railway.app/vnpay/create_payment_url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

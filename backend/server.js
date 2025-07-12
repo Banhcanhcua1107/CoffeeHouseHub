@@ -57,7 +57,10 @@ const uploadCsv = multer({ storage: diskStorage });
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  origin: ["http://localhost:5173", "https://coffeehousehub.vercel.app"], // thêm domain frontend của bạn
+  credentials: true // nếu dùng cookie hoặc xác thực
+}));
 
 const saltRounds = 10;
 const jwtSecret = 'your_jwt_secret_key';
@@ -1413,6 +1416,7 @@ app.post("/notifications/mark-read", authenticateJWT, async (req, res) => {
 });
 
 // Start Server
-app.listen(3000, () => {
-    console.log("Server chạy tại http://localhost:3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Server đang chạy trên cổng ${PORT}. Nếu deploy Railway, hãy dùng domain Railway để truy cập API.`);
 });

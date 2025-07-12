@@ -21,7 +21,7 @@ const UserContactForm = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:3000/contact/send", formState);
+      const res = await axios.post("https://coffee-backend.up.railway.app/contact/send", formState);
       if (res.data.success) {
         message.success(res.data.message);
         setFormState({ name: "", email: "", message: "" });
@@ -112,7 +112,7 @@ const AdminContactManager = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:3000/contacts', { headers: { Authorization: `Bearer ${token}` } });
+            const res = await axios.get('https://coffee-backend.up.railway.app/contacts', { headers: { Authorization: `Bearer ${token}` } });
             setContacts(res.data);
         } catch (error) {
             message.error("Không thể tải danh sách liên hệ.");
@@ -132,7 +132,7 @@ const AdminContactManager = () => {
         if (contact.status === 'new') {
             try {
                 const token = localStorage.getItem('token');
-                await axios.put(`http://localhost:3000/contacts/${contact.id}/status`, { status: 'read' }, { headers: { Authorization: `Bearer ${token}` } });
+                await axios.put(`https://coffee-backend.up.railway.app/contacts/${contact.id}/status`, { status: 'read' }, { headers: { Authorization: `Bearer ${token}` } });
                 fetchContacts();
             } catch (error) {
                 console.error("Lỗi khi đánh dấu đã đọc:", error);
@@ -144,7 +144,7 @@ const AdminContactManager = () => {
         setReplyLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.put(`http://localhost:3000/contacts/${selectedContact.id}/reply`, values, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.put(`https://coffee-backend.up.railway.app/contacts/${selectedContact.id}/reply`, values, { headers: { Authorization: `Bearer ${token}` } });
             message.success("Đã gửi phản hồi thành công!");
             setIsModalVisible(false);
             fetchContacts();

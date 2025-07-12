@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
+
+const API_BASE_URL = 'https://coffee-backend.up.railway.app';
 import BlogSidebar from "@/components/page/BlogSidebar";
 
 import ParallaxBG from "@/components/img/Heros/slider4.jpeg";
@@ -12,7 +14,7 @@ export default function AllNewsPage() {
   const [news, setNews] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:3000/news")
+    axios.get(`${API_BASE_URL}/news`)
       .then(res => setNews(res.data))
       .catch(() => setNews([]));
   }, []);

@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
+const API_BASE_URL = 'https://coffee-backend.up.railway.app';
+
 function UserList() {
   const [users, setUsers] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:3000/users')
+    axios.get(`${API_BASE_URL}/users`)
       .then(res => {
         console.log("Dữ liệu từ API:", res.data);
         setUsers(res.data);

@@ -4,6 +4,9 @@ import { Button, Space, message } from 'antd';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
 import { ShopContext } from '@/components/context/ShopContext';
+
+// Đặt URL backend Railway ở đây (có thể chuyển sang biến môi trường nếu cần)
+const API_BASE_URL = 'https://coffee-backend.up.railway.app';
 import { FaBell } from 'react-icons/fa';
 
 // --- Helper function để gọi API và quản lý state loading/error ---
@@ -110,7 +113,7 @@ function BTN() {
       ? { email: formData.email, password: formData.password }
       : { username: formData.username, fullname: formData.fullname, email: formData.email, password: formData.password };
     
-    apiCall('post', `http://localhost:3000${endpoint}`, data, setLoading, (responseData) => {
+    apiCall('post', `${API_BASE_URL}${endpoint}`, data, setLoading, (responseData) => {
       message.success(responseData.message);
       localStorage.setItem('token', responseData.token);
       updateUser(responseData.user);
@@ -122,12 +125,12 @@ function BTN() {
   const handleResetSubmit = (e) => {
     e.preventDefault();
     if (resetStep === 1) {
-        apiCall('post', 'http://localhost:3000/request-password-reset', { email: formData.email }, setLoading, (data) => {
+        apiCall('post', `${API_BASE_URL}/request-password-reset`, { email: formData.email }, setLoading, (data) => {
           message.success(data.message);
           setResetStep(2);
         });
     } else if (resetStep === 2) {
-        apiCall('post', 'http://localhost:3000/verify-reset-code', { email: formData.email, code: formData.resetCode }, setLoading, (data) => {
+        apiCall('post', `${API_BASE_URL}/verify-reset-code`, { email: formData.email, code: formData.resetCode }, setLoading, (data) => {
             message.success(data.message);
             setResetStep(3);
         });
@@ -137,7 +140,7 @@ function BTN() {
             return;
         }
         const data = { email: formData.email, code: formData.resetCode, newPassword: formData.newPassword };
-        apiCall('post', 'http://localhost:3000/reset-password', data, setLoading, (responseData) => {
+        apiCall('post', `${API_BASE_URL}/reset-password`, data, setLoading, (responseData) => {
             message.success(responseData.message);
             toggleForm('login');
         });
@@ -146,7 +149,7 @@ function BTN() {
 
   const handleResendCode = useCallback(() => {
     if (resendCooldown > 0) return;
-    apiCall('post', 'http://localhost:3000/request-password-reset', { email: formData.email }, setLoading, (data) => {
+    apiCall('post', `${API_BASE_URL}/request-password-reset`, { email: formData.email }, setLoading, (data) => {
         message.success(data.message);
         setResendCooldown(30);
     });

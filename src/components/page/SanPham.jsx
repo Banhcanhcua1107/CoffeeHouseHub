@@ -45,7 +45,7 @@ function SanPham() {
     formData.append('image', fileList[0].originFileObj);
     const token = localStorage.getItem('token');
     try {
-      await axios.post('http://localhost:3000/products', formData, { headers: { 'Authorization': `Bearer ${token}` } });
+      await axios.post('https://coffee-backend.up.railway.app/products', formData, { headers: { 'Authorization': `Bearer ${token}` } });
       message.success('Thêm sản phẩm thành công!');
       setIsAddModalVisible(false);
       addForm.resetFields();
@@ -68,7 +68,7 @@ function SanPham() {
     }
     const token = localStorage.getItem('token');
     try {
-      await axios.put(`http://localhost:3000/products/${editingItem.id}`, formData, { headers: { 'Authorization': `Bearer ${token}` } });
+      await axios.put(`https://coffee-backend.up.railway.app/products/${editingItem.id}`, formData, { headers: { 'Authorization': `Bearer ${token}` } });
       message.success('Cập nhật sản phẩm thành công!');
       setIsEditModalVisible(false);
       if(fetchProducts) fetchProducts();
@@ -80,7 +80,7 @@ function SanPham() {
   const handleDeleteProduct = async (id) => {
     const token = localStorage.getItem('token');
     try {
-      await axios.delete(`http://localhost:3000/products/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
+      await axios.delete(`https://coffee-backend.up.railway.app/products/${id}`, { headers: { 'Authorization': `Bearer ${token}` } });
       message.success('Xóa sản phẩm thành công!');
       setIsEditModalVisible(false);
       if(fetchProducts) fetchProducts();
@@ -95,7 +95,7 @@ function SanPham() {
     setLoading(true);
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.post('http://localhost:3000/products/import', formData, {
+        const response = await axios.post('https://coffee-backend.up.railway.app/products/import', formData, {
             headers: { 'Content-Type': 'multipart/form-data', 'Authorization': `Bearer ${token}` }
         });
         setIsImportModalVisible(false);

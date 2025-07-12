@@ -29,11 +29,13 @@ const Orders = () => {
     pageSize: 10,
   });
 
+  // Đặt URL backend Railway ở đây (có thể chuyển sang biến môi trường nếu cần)
+  const API_BASE_URL = 'https://coffee-backend.up.railway.app';
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem('token');
-      const res = await fetch('http://localhost:3000/orders', {
+      const res = await fetch(`${API_BASE_URL}/orders`, {
         headers: { 'Authorization': `Bearer ${token}` },
       });
       const data = await res.json();
@@ -65,7 +67,7 @@ const Orders = () => {
     setIsUpdating(true);
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`http://localhost:3000/orders/${orderId}/status`, {
+      const res = await fetch(`${API_BASE_URL}/orders/${orderId}/status`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
         body: JSON.stringify({ [field]: value, ...extraData })
