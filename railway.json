@@ -10,7 +10,7 @@
           "cmds": ["cd backend ; npm run build"]
         },
         "start": {
-          "cmds": ["cd backend ; npm start"]
+          "cmds": ["cd backend && npm start"]
         }
       }
     }
