@@ -1,5 +1,5 @@
 import { FaInstagram, FaTwitter, FaFacebookF, FaTumblr, FaVimeoV, FaLinkedinIn } from 'react-icons/fa';
-import Avatar from '@/components/IMG/LOGOCOFFE/bienlaigmail.png';
+import Avatar from '@/components/img/LOGOCOFFE/bienlaigmail.png';
 
 export default function BlogSidebar() {
   return (
