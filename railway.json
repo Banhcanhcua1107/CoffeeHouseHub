@@ -5,15 +5,16 @@
       "phases": {
         "install": {
           "cmds": [
-            "npm install --workspaces --include-workspace-root",
-            "cd backend && npm install"
+            "cd backend && npm install && cd .."
           ]
         },
         "build": {
-          "cmds": ["npm run build || true"]
+          "cmds": []
         },
         "start": {
-          "cmds": ["npm run start:backend"]
+          "cmds": [
+            "cd backend && node server.js"
+          ]
         }
       }
     }
