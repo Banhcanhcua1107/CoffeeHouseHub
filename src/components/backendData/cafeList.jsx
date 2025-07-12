@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 
-const API_BASE_URL = 'https://coffee-backend.up.railway.app';
+const API_BASE_URL = 'https://coffeehousehub-production.up.railway.app';
 
 function CafeList() {
   const [cafes, setCafes] = useState([]);

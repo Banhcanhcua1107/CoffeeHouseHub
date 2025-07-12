@@ -61,18 +61,30 @@ const app = express();
 const allowedOrigins = [
   'https://coffeehousehub-production.up.railway.app',
   'https://coffee-backend.up.railway.app',
+  'https://coffeehousehub.vercel.app',
+  'https://coffe-website-steel.vercel.app',
   'http://localhost:5173',
+  'http://localhost:3000'
 ];
 
 app.use(express.json());
 app.use((req, res, next) => {
   const origin = req.headers.origin;
+  
+  // Log origin for debugging
+  if (process.env.NODE_ENV === 'production') {
+    console.log('🌐 Request origin:', origin);
+  }
+  
   if (allowedOrigins.includes(origin)) {
     res.header('Access-Control-Allow-Origin', origin);
     res.header('Access-Control-Allow-Credentials', 'true');
     res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  } else if (process.env.NODE_ENV === 'production') {
+    console.log('⚠️  Origin not allowed:', origin);
   }
+  
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
