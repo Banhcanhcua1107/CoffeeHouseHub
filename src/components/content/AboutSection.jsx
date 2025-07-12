@@ -1,4 +1,4 @@
-import About from "/src/components/img/AboutSection/about.jpg";
+import About from "@/components/img/AboutSection/about.jpg";
 
 function AboutSection() {
   return (

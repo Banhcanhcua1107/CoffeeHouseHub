@@ -1,5 +1,5 @@
 import { useContext, useState, useEffect } from "react";
-import { ShopContext } from "/src/components/context/ShopContext";
+import { ShopContext } from "@/components/context/ShopContext";
 import { useNavigate, useLocation } from 'react-router-dom';
 
 function Cart() {

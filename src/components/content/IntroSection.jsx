@@ -1,7 +1,7 @@
 // --- START OF FILE IntroSection.jsx ---
 
 import { Link } from "react-router-dom";
-import { I1, I2, I3, I4 } from "/src/components/img/Intro";
+import { I1, I2, I3, I4 } from "@/components/img/Intro";
 
 function IntroSection() {
   // BẠN CẦN THAY THẾ CÁC SỐ ID DƯỚI ĐÂY BẰNG ID THỰC TẾ TRONG DATABASE CỦA BẠN

@@ -1,11 +1,11 @@
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "/src/components/css/HeroSection.css";
-import Slider1 from "/src/components/img/Heros/slider1.jpeg"
-import Slider2 from "/src/components/img/Heros/slider2.jpeg"
-import Slider3 from "/src/components/img/Heros/slider3.jpeg"
-import Slider4 from "/src/components/img/Heros/slider4.jpeg"
+import "@/components/css/HeroSection.css";
+import Slider1 from "@/components/img/Heros/slider1.jpeg"
+import Slider2 from "@/components/img/Heros/slider2.jpeg"
+import Slider3 from "@/components/img/Heros/slider3.jpeg"
+import Slider4 from "@/components/img/Heros/slider4.jpeg"
 import { Link } from "react-router-dom";
 
 function HeroSection() {

@@ -3,7 +3,7 @@
 import { useContext } from "react";
 // Xóa các import ảnh local vì không còn cần thiết
 // import { P1, P2, ... } from "../IMG/Product/"; 
-import { ShopContext } from "/src/components/context/ShopContext";
+import { ShopContext } from "@/components/context/ShopContext";
 
 function Product() {
   // Xóa imageMap vì chúng ta sẽ dùng URL trực tiếp

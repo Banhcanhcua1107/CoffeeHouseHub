@@ -4,7 +4,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import '@fontsource/be-vietnam-pro/400.css';
 import '@fontsource/be-vietnam-pro/700.css';
-import { ShopProvider } from '@/components/context/shopContext';
+import { ShopProvider } from '@/components/context/ShopContext';
 import ScrollToTop from '@/components/router/ScrollToTop';
 function App() {
   return (

@@ -4,11 +4,11 @@ import { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 // Xóa import ảnh local không cần thiết
 // import { S1, S2, ... } from "../IMG/Shop/"; 
-import { ShopContext } from "../context/shopContext";
+import { ShopContext } from "@/components/context/ShopContext";
 import axios from 'axios';
 import { shuffle } from 'lodash';
-import "../CSS/Parallax.css";
-import ParallaxBG from "../IMG/Heros/Slider4.jpeg";
+import "@/components/css/Parallax.css";
+import ParallaxBG from "@/components/img/Heros/slider4.jpeg";
 
 // Xóa imageMap vì không còn dùng
 // const imageMap = { ... };
