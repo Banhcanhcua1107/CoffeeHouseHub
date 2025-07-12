@@ -8,7 +8,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "echo 'Build completed successfully'",
+    "build": "vite build",
     "lint": "eslint .",
     "start": "cd backend && npm start",
     "preview": "vite preview",
