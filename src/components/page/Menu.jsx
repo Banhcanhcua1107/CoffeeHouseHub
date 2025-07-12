@@ -1,9 +1,9 @@
 import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
-import "@/components/CSS/Parallax.css";
+import "@/components/css/Parallax.css";
 import ParallaxBG from "@/components/img/Heros/slider4.jpeg";
-import { ShopContext } from "@/components/context/shopContext";
+import { ShopContext } from "@/components/context/ShopContext";
 import { Button, Modal, Form, Input, InputNumber, message, Upload, Popconfirm, Tooltip } from 'antd'; // Thêm Tooltip
 import { PlusOutlined, SearchOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
 import AdminSidebar from '@/components/Admin/AdminSidebar';
