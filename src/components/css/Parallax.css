@@ -1,0 +1,19 @@
+.parallax-section {
+  height: 45vh;
+  background-attachment: fixed;
+  background-position: center;
+  background-size: cover;
+  position: relative;
+}
+
+.parallax-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.parallax-section h2 {
+  position: relative;
+  z-index: 1;
+}

@@ -1,0 +1,82 @@
+/* Dots */
+.slick-dots {
+  bottom: 40px;
+}
+
+.slick-dots li button:before {
+  color: white;
+  font-size: 12px;
+  opacity: 0.7;
+}
+
+.slick-dots li.slick-active button:before {
+  color: #FFD8A9;
+  opacity: 1;
+}
+
+/* Arrows - di chuyển vào trong */
+.slick-prev, .slick-next {
+  z-index: 20;
+  width: 45px;
+  height: 45px;
+  background-color: rgba(0, 0, 0, 0.4); /* nền mờ nhẹ */
+  border-radius: 9999px; /* hình tròn */
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.slick-prev {
+  left: 20px; /* đẩy vào trong */
+}
+
+.slick-next {
+  right: 20px;
+}
+
+.slick-prev:before,
+.slick-next:before {
+  font-size: 22px;
+  color: white;
+  opacity: 0.9;
+  content: ""; /* xóa icon mặc định */
+}
+
+.slick-prev svg,
+.slick-next svg {
+  width: 20px;
+  height: 20px;
+  color: white;
+}
+
+.slick-prev:hover,
+.slick-next:hover {
+  background-color: #D9A074;
+}
+
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-slide-up {
+  animation: fadeSlideUp 0.8s ease-out forwards;
+}
+
+.fade-delay-300 {
+  animation-delay: 0.3s;
+}
+.fade-delay-500 {
+  animation-delay: 0.5s;
+}
+.fade-delay-700 {
+  animation-delay: 0.7s;
+}

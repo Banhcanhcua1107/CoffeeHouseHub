@@ -1,0 +1,45 @@
+# Nội dung cũ của bạn (logs và debug files)
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Node modules và build output (đã có, giữ nguyên)
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files (đã có, giữ nguyên)
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Bổ sung cho project React/Vite: Bỏ qua environment variables (secrets)
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Bổ sung: Bỏ qua file cá nhân và tạm thời
+DACS_DANGTHANHNHAL_2205*  # File cá nhân của bạn
+*.tmp
+*.bak
+
+# Bổ sung: Bỏ qua file data nhạy cảm (nếu file CSV chứa info riêng tư)
+src/products_import_full.csv
+
+# Bổ sung cho Vite/Tailwind: Bỏ qua cache và build temp
+.vite/
+postcss.config.js.cache  # Nếu có cache Tailwind
+.vercel

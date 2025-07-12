@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    @apply font-sans;
+}
+
+.text-sw {
+    text-shadow: currentColor 1px 0 0;
+}
