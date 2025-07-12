@@ -56,9 +56,15 @@ const diskStorage = multer.diskStorage({
 const uploadCsv = multer({ storage: diskStorage });
 
 const app = express();
+
+const allowedOrigins = [
+  'https://coffeehousehub-production.up.railway.app',
+  'https://coffe-website-nine.vercel.app',
+];
+
 app.use(express.json());
 app.use(cors({
-  origin: '*', // thêm domain frontend của bạn
+  origin: allowedOrigins, // thêm domain frontend của bạn
   credentials: true // nếu dùng cookie hoặc xác thực
 }));
 
