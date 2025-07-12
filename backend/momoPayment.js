@@ -95,4 +95,16 @@ router.post('/ipn', async (req, res) => {
   res.status(204).send();
 });
 
+// Test endpoint to check momo configuration
+router.get('/test-config', (req, res) => {
+  res.json({
+    partnerCode: partnerCode || 'MISSING',
+    accessKey: accessKey || 'MISSING',
+    secretKey: secretKey ? 'SET' : 'MISSING',
+    redirectUrl: redirectUrl || 'MISSING',
+    ipnUrl: ipnUrl || 'MISSING',
+    timestamp: new Date().toISOString()
+  });
+});
+
 module.exports = router;
