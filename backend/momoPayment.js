@@ -16,6 +16,17 @@ const { sendReceiptEmail } = require('./sendMailHelper');
 router.post('/create', async (req, res) => {
   const { amount, orderInfo, orderId, email, fullname, phone, address, note, userId, cart } = req.body;
   
+  // Debug logging
+  console.log('🔍 Momo Payment Request Debug:');
+  console.log('orderId:', orderId);
+  console.log('amount:', amount);
+  console.log('orderInfo:', orderInfo);
+  console.log('redirectUrl:', redirectUrl);
+  console.log('ipnUrl:', ipnUrl);
+  console.log('partnerCode:', partnerCode);
+  console.log('accessKey:', accessKey);
+  console.log('secretKey length:', secretKey ? secretKey.length : 0);
+  
   if (!orderId) {
     return res.status(400).json({ error: 'Thiếu mã đơn hàng (orderId).' });
   }
@@ -55,11 +66,17 @@ router.post('/create', async (req, res) => {
     lang: 'vi'
   };
 
+  console.log('📤 Momo Request Body:', JSON.stringify(requestBody, null, 2));
+
   try {
     const momoRes = await axios.post('https://test-payment.momo.vn/v2/gateway/api/create', requestBody);
+    console.log('✅ Momo Response:', momoRes.data);
     return res.json({ payUrl: momoRes.data.payUrl });
   } catch (err) {
-    console.error("Lỗi khi tạo thanh toán MoMo:", err.response?.data || err.message);
+    console.error("❌ Lỗi khi tạo thanh toán MoMo:", err.response?.data || err.message);
+    if (err.response?.data) {
+      console.error("❌ Full Momo Error Response:", JSON.stringify(err.response.data, null, 2));
+    }
     return res.status(500).json({ error: 'Tạo thanh toán thất bại!', details: err.response?.data });
   }
 });
