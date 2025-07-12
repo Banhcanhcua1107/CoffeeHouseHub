@@ -16,7 +16,7 @@ import { motion } from 'framer-motion';
 import axios from 'axios';
 
 import AdminSidebar from '@/components/Admin/AdminSidebar';
-import { ShopContext } from '@/components/context/shopContext';
+import { ShopContext } from '@/components/context/ShopContext';
 
 ChartJS.register(
   CategoryScale,
