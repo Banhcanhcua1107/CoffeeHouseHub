@@ -4,13 +4,13 @@
     "nixpacksPlan": {
       "phases": {
         "install": {
-          "cmds": ["npm install --workspaces --include-workspace-root"]
+          "cmds": ["cd backend && npm install"]
         },
         "build": {
-          "cmds": []
+          "cmds": ["cd backend && npm run build"]
         },
         "start": {
-          "cmds": ["npm start --workspace backend"]
+          "cmds": ["cd backend && npm start"]
         }
       }
     }
