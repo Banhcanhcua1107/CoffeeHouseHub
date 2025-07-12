@@ -6,7 +6,7 @@ export default function NewsSection() {
   const [news, setNews] = useState([]);
 
   useEffect(() => {
-    axios.get("https://coffee-backend.up.railway.app/news")
+    axios.get("https://coffeehousehub-production.up.railway.app/news")
       .then(res => setNews(res.data.slice(0, 3)))
       .catch(() => setNews([]));
   }, []);

@@ -66,24 +66,28 @@ function Checkout() {
             fetchCart();
             navigate('/cam-on');
         } else if (formData.paymentMethod === 'momo') {
+            const orderCode = `COFFEE${new Date().getTime()}`;
             const res = await fetch('https://coffeehousehub-production.up.railway.app/momo/create', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...commonOrderData,
-                    orderInfo: `Thanh toán đơn hàng cho ${user.fullname}`,
+                    orderId: orderCode,
+                    orderInfo: `Thanh toán đơn hàng CoffeeHouse #${orderCode}`,
                 })
             });
             const data = await res.json();
             if (data.payUrl) window.location.href = data.payUrl;
             else alert('Không thể tạo thanh toán MoMo.');
         } else if (formData.paymentMethod === 'vnpay') {
+            const orderCode = `COFFEE${new Date().getTime()}`;
             const res = await fetch('https://coffeehousehub-production.up.railway.app/vnpay/create_payment_url', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     ...commonOrderData,
-                    orderDescription: `Thanh toán đơn hàng cho ${user.fullname}`,
+                    orderId: orderCode,
+                    orderDescription: `Thanh toán đơn hàng CoffeeHouse #${orderCode}`,
                     language: 'vn',
                     bankCode: ''
                 })

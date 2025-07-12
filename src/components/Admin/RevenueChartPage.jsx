@@ -77,7 +77,7 @@ function RevenueChartPage() {
     const fetchRevenueData = async () => {
       setLoading(true);
       try {
-        const response = await axios.get(`https://coffee-backend.up.railway.app/api/admin/revenue`, {
+        const response = await axios.get(`https://coffeehousehub-production.up.railway.app/api/admin/revenue`, {
           params: { year: selectedYear, month: selectedMonth }
         });
         
