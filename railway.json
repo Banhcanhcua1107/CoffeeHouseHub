@@ -4,10 +4,10 @@
     "nixpacksPlan": {
       "phases": {
         "install": {
-          "cmds": ["cd backend ; npm install"]
+          "cmds": ["cd backend && npm install"]
         },
         "build": {
-          "cmds": ["cd backend ; npm run build"]
+          "cmds": ["cd backend && npm run build"]
         },
         "start": {
           "cmds": ["cd backend && npm start"]
