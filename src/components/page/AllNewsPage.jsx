@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 
-const API_BASE_URL = 'https://coffee-backend.up.railway.app';
+const API_BASE_URL = 'https://coffeehousehub-production.up.railway.app/';
 import BlogSidebar from "@/components/page/BlogSidebar";
 
 import ParallaxBG from "@/components/img/Heros/slider4.jpeg";

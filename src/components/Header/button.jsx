@@ -6,7 +6,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { ShopContext } from '@/components/context/ShopContext';
 
 // Đặt URL backend Railway ở đây (có thể chuyển sang biến môi trường nếu cần)
-const API_BASE_URL = 'https://coffee-backend.up.railway.app';
+const API_BASE_URL = 'https://coffeehousehub-production.up.railway.app';
 import { FaBell } from 'react-icons/fa';
 
 // --- Helper function để gọi API và quản lý state loading/error ---

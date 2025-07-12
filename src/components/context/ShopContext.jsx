@@ -2,7 +2,7 @@ import React, { createContext, useState, useEffect, useCallback } from "react";
 import axios from "axios";
 
 // Đặt URL backend Railway ở đây (dùng HTTPS, KHÔNG có port để tránh lỗi SSL)
-const API_BASE_URL = 'https://coffee-backend.up.railway.app';
+const API_BASE_URL = 'https://coffeehousehub-production.up.railway.app';
 import { message } from 'antd'; // Sử dụng message của antd để thông báo đẹp hơn
 
 export const ShopContext = createContext(null);
