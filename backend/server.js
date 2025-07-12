@@ -57,16 +57,26 @@ const uploadCsv = multer({ storage: diskStorage });
 
 const app = express();
 
+
 const allowedOrigins = [
   'https://coffeehousehub-production.up.railway.app',
   'https://coffe-website-nine.vercel.app',
 ];
 
 app.use(express.json());
-app.use(cors({
-  origin: allowedOrigins, // thêm domain frontend của bạn
-  credentials: true // nếu dùng cookie hoặc xác thực
-}));
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  }
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
 
 const saltRounds = 10;
 const jwtSecret = 'your_jwt_secret_key';
