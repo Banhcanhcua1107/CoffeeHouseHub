@@ -135,9 +135,6 @@ async function initializeDatabase() {
                     waitForConnections: true,
                     connectionLimit: 10,
                     queueLimit: 0,
-                    acquireTimeout: 60000,
-                    timeout: 60000,
-                    reconnect: true,
                     ssl: {
                         rejectUnauthorized: false
                     }
@@ -161,9 +158,6 @@ async function initializeDatabase() {
                     waitForConnections: true,
                     connectionLimit: 10,
                     queueLimit: 0,
-                    acquireTimeout: 60000,
-                    timeout: 60000,
-                    reconnect: true,
                     ssl: {
                         rejectUnauthorized: false
                     }
@@ -185,9 +179,6 @@ async function initializeDatabase() {
                 waitForConnections: true,
                 connectionLimit: 10,
                 queueLimit: 0,
-                acquireTimeout: 60000,
-                timeout: 60000,
-                reconnect: true,
                 ssl: {
                     rejectUnauthorized: false
                 }
@@ -205,9 +196,6 @@ async function initializeDatabase() {
                 waitForConnections: true,
                 connectionLimit: 10,
                 queueLimit: 0,
-                acquireTimeout: 60000,
-                timeout: 60000,
-                reconnect: true,
                 ssl: {
                     rejectUnauthorized: false
                 }
@@ -225,9 +213,6 @@ async function initializeDatabase() {
                 waitForConnections: true,
                 connectionLimit: 10,
                 queueLimit: 0,
-                acquireTimeout: 60000,
-                timeout: 60000,
-                reconnect: true,
                 ssl: {
                     rejectUnauthorized: false
                 }
@@ -244,10 +229,10 @@ async function initializeDatabase() {
 
         dbPool = mysql.createPool(dbConfig);
         
-        // Test connection with timeout
+        // Test connection with simple query
         console.log('🔄 Testing database connection...');
         const testQuery = await Promise.race([
-            dbPool.query("SELECT 1 as test, NOW() as current_time"),
+            dbPool.query("SELECT 1 as test"),
             new Promise((_, reject) => 
                 setTimeout(() => reject(new Error('Connection timeout')), 15000)
             )
