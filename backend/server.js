@@ -100,21 +100,111 @@ let dbPool;
 
 async function initializeDatabase() {
     try {
-        dbPool = mysql.createPool({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_DATABASE,
-            port: process.env.DB_PORT,
-            waitForConnections: true,
-            connectionLimit: 10,
-            queueLimit: 0
+        // Debug: Log all environment variables
+        console.log('🔍 Environment Variables Debug:');
+        console.log('DB_HOST:', process.env.DB_HOST);
+        console.log('DB_USER:', process.env.DB_USER);
+        console.log('DB_PASSWORD:', process.env.DB_PASSWORD ? '***SET***' : 'MISSING');
+        console.log('DB_DATABASE:', process.env.DB_DATABASE);
+        console.log('DB_PORT:', process.env.DB_PORT);
+        console.log('NODE_ENV:', process.env.NODE_ENV);
+        console.log('PORT:', process.env.PORT);
+        console.log('DATABASE_URL:', process.env.DATABASE_URL ? '***SET***' : 'MISSING');
+
+        let dbConfig;
+
+        // Check if we have a DATABASE_URL (connection string format)
+        if (process.env.DATABASE_URL) {
+            console.log('📡 Using DATABASE_URL connection string');
+            try {
+                const url = new URL(process.env.DATABASE_URL);
+                dbConfig = {
+                    host: url.hostname,
+                    user: url.username,
+                    password: url.password,
+                    database: url.pathname.slice(1), // Remove leading slash
+                    port: parseInt(url.port) || 3306,
+                    waitForConnections: true,
+                    connectionLimit: 10,
+                    queueLimit: 0,
+                    acquireTimeout: 60000,
+                    timeout: 60000,
+                    reconnect: true,
+                    ssl: {
+                        rejectUnauthorized: false
+                    }
+                };
+            } catch (urlError) {
+                console.error('❌ Error parsing DATABASE_URL:', urlError);
+                throw new Error('Invalid DATABASE_URL format');
+            }
+        } else {
+            // Use individual environment variables
+            console.log('📡 Using individual environment variables');
+            
+            // Validate required environment variables
+            const requiredEnvVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_DATABASE', 'DB_PORT'];
+            const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
+            
+            if (missingVars.length > 0) {
+                console.error('❌ Missing required environment variables:', missingVars);
+                throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+            }
+
+            dbConfig = {
+                host: process.env.DB_HOST,
+                user: process.env.DB_USER,
+                password: process.env.DB_PASSWORD,
+                database: process.env.DB_DATABASE,
+                port: parseInt(process.env.DB_PORT) || 3306,
+                waitForConnections: true,
+                connectionLimit: 10,
+                queueLimit: 0,
+                acquireTimeout: 60000,
+                timeout: 60000,
+                reconnect: true,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            };
+        }
+
+        console.log('📡 Database configuration:', {
+            host: dbConfig.host,
+            user: dbConfig.user,
+            database: dbConfig.database,
+            port: dbConfig.port,
+            ssl: dbConfig.ssl ? 'enabled' : 'disabled'
         });
-        await dbPool.query("SELECT 1");
-        console.log("Đã kết nối DB thành công (pool)");
+
+        dbPool = mysql.createPool(dbConfig);
+        
+        // Test connection with timeout
+        console.log('🔄 Testing database connection...');
+        const testQuery = await Promise.race([
+            dbPool.query("SELECT 1 as test, NOW() as current_time"),
+            new Promise((_, reject) => 
+                setTimeout(() => reject(new Error('Connection timeout')), 15000)
+            )
+        ]);
+        
+        console.log("✅ Database connection successful!");
+        console.log("📊 Test query result:", testQuery[0]);
+        
     } catch (err) {
-        console.error("Không thể kết nối database:", err.message);
-        process.exit(1);
+        console.error("❌ Database connection failed:", err.message);
+        console.error("📄 Full error details:", err);
+        
+        // In production, retry after a delay
+        if (process.env.NODE_ENV === 'production') {
+            console.log('⏳ Retrying database connection in 10 seconds...');
+            setTimeout(() => {
+                initializeDatabase();
+            }, 10000);
+        } else {
+            console.log('💀 Exiting due to database connection failure in development mode');
+            process.exit(1);
+        }
     }
 }
 
