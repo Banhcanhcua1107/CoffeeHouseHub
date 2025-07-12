@@ -30,7 +30,7 @@ function ProductDetail() {
     
     const fetchProductFromAPI = async () => {
       try {
-        const response = await axios.get(`https://coffee-backend.up.railway.app/products/${id}`);
+        const response = await axios.get(`https://coffeehousehub-production.up.railway.app/products/${id}`);
         setProduct(response.data);
       } catch (error) {
         console.error("Lỗi khi lấy chi tiết sản phẩm:", error);

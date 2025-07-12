@@ -11,7 +11,7 @@ export default function NewspaperDetail() {
   useEffect(() => {
     setLoading(true);
     axios
-      .get(`https://coffee-backend.up.railway.app/news/${id}`)
+      .get(`https://coffeehousehub-production.up.railway.app/news/${id}`)
       .then((res) => setNews(res.data))
       .catch(() => setNews(null))
       .finally(() => setLoading(false));
