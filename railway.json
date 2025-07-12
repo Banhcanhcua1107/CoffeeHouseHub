@@ -5,7 +5,8 @@
       "phases": {
         "install": {
           "cmds": [
-            "cd backend && npm install && cd .."
+            "npm install",
+            "cd backend && npm install"
           ]
         },
         "build": {
@@ -13,7 +14,7 @@
         },
         "start": {
           "cmds": [
-            "cd backend && node server.js"
+            "cd backend && npm start"
           ]
         }
       }
