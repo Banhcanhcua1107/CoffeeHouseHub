@@ -58,7 +58,7 @@ const uploadCsv = multer({ storage: diskStorage });
 const app = express();
 app.use(express.json());
 app.use(cors({
-  origin: ["http://localhost:5173", "https://coffeehousehub.vercel.app"], // thêm domain frontend của bạn
+  origin: '*', // thêm domain frontend của bạn
   credentials: true // nếu dùng cookie hoặc xác thực
 }));
 
