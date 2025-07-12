@@ -110,10 +110,18 @@ async function initializeDatabase() {
         console.log('NODE_ENV:', process.env.NODE_ENV);
         console.log('PORT:', process.env.PORT);
         console.log('DATABASE_URL:', process.env.DATABASE_URL ? '***SET***' : 'MISSING');
+        
+        // Check for Railway's MySQL variables
+        console.log('MYSQL_URL:', process.env.MYSQL_URL ? '***SET***' : 'MISSING');
+        console.log('MYSQLHOST:', process.env.MYSQLHOST);
+        console.log('MYSQLUSER:', process.env.MYSQLUSER);
+        console.log('MYSQLPASSWORD:', process.env.MYSQLPASSWORD ? '***SET***' : 'MISSING');
+        console.log('MYSQLDATABASE:', process.env.MYSQLDATABASE);
+        console.log('MYSQLPORT:', process.env.MYSQLPORT);
 
         let dbConfig;
 
-        // Check if we have a DATABASE_URL (connection string format)
+        // Priority 1: Check for DATABASE_URL
         if (process.env.DATABASE_URL) {
             console.log('📡 Using DATABASE_URL connection string');
             try {
@@ -122,7 +130,7 @@ async function initializeDatabase() {
                     host: url.hostname,
                     user: url.username,
                     password: url.password,
-                    database: url.pathname.slice(1), // Remove leading slash
+                    database: url.pathname.slice(1),
                     port: parseInt(url.port) || 3306,
                     waitForConnections: true,
                     connectionLimit: 10,
@@ -138,25 +146,82 @@ async function initializeDatabase() {
                 console.error('❌ Error parsing DATABASE_URL:', urlError);
                 throw new Error('Invalid DATABASE_URL format');
             }
-        } else {
-            // Use individual environment variables
-            console.log('📡 Using individual environment variables');
-            
-            // Validate required environment variables
-            const requiredEnvVars = ['DB_HOST', 'DB_USER', 'DB_PASSWORD', 'DB_DATABASE', 'DB_PORT'];
-            const missingVars = requiredEnvVars.filter(varName => !process.env[varName]);
-            
-            if (missingVars.length > 0) {
-                console.error('❌ Missing required environment variables:', missingVars);
-                throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
+        } 
+        // Priority 2: Check for MYSQL_URL (Railway's format)
+        else if (process.env.MYSQL_URL) {
+            console.log('📡 Using MYSQL_URL connection string');
+            try {
+                const url = new URL(process.env.MYSQL_URL);
+                dbConfig = {
+                    host: url.hostname,
+                    user: url.username,
+                    password: url.password,
+                    database: url.pathname.slice(1),
+                    port: parseInt(url.port) || 3306,
+                    waitForConnections: true,
+                    connectionLimit: 10,
+                    queueLimit: 0,
+                    acquireTimeout: 60000,
+                    timeout: 60000,
+                    reconnect: true,
+                    ssl: {
+                        rejectUnauthorized: false
+                    }
+                };
+            } catch (urlError) {
+                console.error('❌ Error parsing MYSQL_URL:', urlError);
+                throw new Error('Invalid MYSQL_URL format');
             }
-
+        }
+        // Priority 3: Check for Railway's individual MySQL variables
+        else if (process.env.MYSQLHOST && process.env.MYSQLUSER && process.env.MYSQLPASSWORD && process.env.MYSQLDATABASE) {
+            console.log('📡 Using Railway MySQL individual variables');
+            dbConfig = {
+                host: process.env.MYSQLHOST,
+                user: process.env.MYSQLUSER,
+                password: process.env.MYSQLPASSWORD,
+                database: process.env.MYSQLDATABASE,
+                port: parseInt(process.env.MYSQLPORT) || 3306,
+                waitForConnections: true,
+                connectionLimit: 10,
+                queueLimit: 0,
+                acquireTimeout: 60000,
+                timeout: 60000,
+                reconnect: true,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            };
+        }
+        // Priority 4: Check for custom DB_ variables
+        else if (process.env.DB_HOST && process.env.DB_USER && process.env.DB_PASSWORD && process.env.DB_DATABASE) {
+            console.log('📡 Using custom DB_ environment variables');
             dbConfig = {
                 host: process.env.DB_HOST,
                 user: process.env.DB_USER,
                 password: process.env.DB_PASSWORD,
                 database: process.env.DB_DATABASE,
                 port: parseInt(process.env.DB_PORT) || 3306,
+                waitForConnections: true,
+                connectionLimit: 10,
+                queueLimit: 0,
+                acquireTimeout: 60000,
+                timeout: 60000,
+                reconnect: true,
+                ssl: {
+                    rejectUnauthorized: false
+                }
+            };
+        }
+        // Priority 5: Fallback to hardcoded values for Railway (temporary)
+        else {
+            console.log('⚠️  Using fallback configuration - this should be temporary!');
+            dbConfig = {
+                host: 'shortline.proxy.rlwy.net',
+                user: 'root',
+                password: 'KdzwBLtuALXhcyhypAILUdOUmimnmKOM',
+                database: 'railway',
+                port: 43930,
                 waitForConnections: true,
                 connectionLimit: 10,
                 queueLimit: 0,
