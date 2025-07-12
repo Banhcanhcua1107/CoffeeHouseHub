@@ -1,0 +1,16 @@
+[variables]
+NODE_ENV = "production"
+
+[phases.install]
+cmds = [
+  "npm ci --only=production",
+  "cd backend && npm ci --only=production"
+]
+
+[phases.build]
+cmds = [
+  "echo 'Build phase completed'"
+]
+
+[start]
+cmd = "cd backend && npm start" 

@@ -1,0 +1,30 @@
+# Frontend source files (not needed for backend deployment)
+src/
+dist/
+public/
+node_modules/
+
+# Development files
+.vscode/
+.idea/
+*.log
+.env.local
+.env.development
+
+# Build artifacts
+dist-ssr/
+*.local
+
+# Test files
+**/*.test.js
+**/*.spec.js
+
+# Documentation
+README.md
+.gitignore
+
+# Config files not needed for production
+eslint.config.js
+vite.config.js
+tailwind.config.js
+postcss.config.js 
