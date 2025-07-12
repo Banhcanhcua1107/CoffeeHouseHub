@@ -10,7 +10,7 @@
           "cmds": ["npm run build || true"]
         },
         "start": {
-          "cmds": ["npm start --workspace backend"]
+          "cmds": ["npm run start:backend"]
         }
       }
     }
