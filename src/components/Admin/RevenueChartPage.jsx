@@ -15,8 +15,8 @@ import { FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import axios from 'axios';
 
-import AdminSidebar from '../Admin/AdminSidebar';
-import { ShopContext } from '../context/shopContext';
+import AdminSidebar from '@/components/Admin/AdminSidebar';
+import { ShopContext } from '@/components/context/shopContext';
 
 ChartJS.register(
   CategoryScale,
