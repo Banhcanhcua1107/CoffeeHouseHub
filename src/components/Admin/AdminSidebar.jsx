@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import Avatar from "../IMG/LOGOCOFFE/bienlaigmail.png";
+import Avatar from "@/components/img/LOGOCOFFE/bienlaigmail.png";
 
 // Icons cho Sidebar Admin
 const MenuIcon = () => (

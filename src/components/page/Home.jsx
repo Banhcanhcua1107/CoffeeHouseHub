@@ -1,9 +1,9 @@
-import HeroSection from "../content/HeroSection";
-import IntroSection from "../content/IntroSection";
-import AboutSection from "../content/AboutSection";
-import Body4Product from "../content/Body4Product";
-import ShopSection from "../content/ShopSection";
-import NewsSection from "../content/NewsSection";
+import HeroSection from "@/components/content/HeroSection";
+import IntroSection from "@/components/content/IntroSection";
+import AboutSection from "@/components/content/AboutSection";
+import Body4Product from "@/components/content/Body4Product";
+import ShopSection from "@/components/content/ShopSection";
+import NewsSection from "@/components/content/NewsSection";
 import { useLocation } from "react-router-dom";
 import { useEffect, useState } from "react";
 

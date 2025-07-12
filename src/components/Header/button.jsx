@@ -3,7 +3,7 @@ import { UserAddOutlined } from '@ant-design/icons';
 import { Button, Space, message } from 'antd';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
-import { ShopContext } from '../context/shopContext';
+import { ShopContext } from '@/components/context/ShopContext';
 import { FaBell } from 'react-icons/fa';
 
 // --- Helper function để gọi API và quản lý state loading/error ---

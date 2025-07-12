@@ -1,10 +1,10 @@
 // --- START OF FILE Orders.jsx ---
 
 import React, { useContext, useEffect, useState, useMemo } from 'react';
-import { ShopContext } from '../context/shopContext';
+import { ShopContext } from '@/components/context/ShopContext';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { message, Select, Spin, Button, Modal, Input, Tag, Card, Table, Pagination, Space, Badge } from 'antd';
-import AdminSidebar from '../Admin/AdminSidebar';
+import AdminSidebar from '@/components/Admin/AdminSidebar';
 import { SearchOutlined } from '@ant-design/icons';
 
 const { TextArea } = Input;

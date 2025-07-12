@@ -1,12 +1,12 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { ShopContext } from "../context/shopContext";
-import ParallaxBG from "../IMG/Heros/Slider4.jpeg";
-import "../CSS/Parallax.css";
+import { ShopContext } from "@/components/context/shopContext";
+import ParallaxBG from "@/components/IMG/Heros/Slider4.jpeg";
+import "@/components/CSS/Parallax.css";
 import { Button, Modal, Form, Input, InputNumber, Switch, message, Upload, Tooltip, Popconfirm } from 'antd';
 import { PlusOutlined, SearchOutlined, UploadOutlined, DownloadOutlined, FileExcelOutlined, DeleteOutlined } from '@ant-design/icons';
-import AdminSidebar from '../Admin/AdminSidebar';
+import AdminSidebar from '@/components/Admin/AdminSidebar';
 
 const { Dragger } = Upload;
 

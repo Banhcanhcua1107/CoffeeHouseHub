@@ -1,10 +1,10 @@
 // Header.jsx
 import React, { useState, useEffect, useRef, useContext } from 'react';
-import BTN from './button';
+import BTN from '@/components/Header/button';
 import { Link, NavLink } from 'react-router-dom';
 import { FaMapMarkerAlt, FaChevronDown } from 'react-icons/fa';
-import Logo from '../IMG/LOGOCOFFE/LogoCoffee.PNG';
-import { ShopContext } from '../context/shopContext';
+import Logo from '@/components/img/LOGOCOFFE/logoCoffee.png';
+import { ShopContext } from '@/components/context/ShopContext';
 
 function Header() {
   const { user } = useContext(ShopContext);

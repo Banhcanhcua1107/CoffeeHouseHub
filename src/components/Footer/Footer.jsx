@@ -1,5 +1,5 @@
 import { FaClock, FaEnvelope, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
-import logo from "../IMG/LOGOCOFFE/LogoCoffee.PNG";
+import logo from "@/components/img/LOGOCOFFE/logoCoffee.png";
 
 function Footer() {
   const branch1Address = "736 Nguyễn Trãi, Phường 11, Quận 5, Tp.HCM";

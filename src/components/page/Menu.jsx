@@ -1,12 +1,12 @@
 import { useState, useContext, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from 'axios';
-import "../CSS/Parallax.css";
-import ParallaxBG from "../IMG/Heros/Slider4.jpeg";
-import { ShopContext } from "../context/shopContext";
+import "@/components/CSS/Parallax.css";
+import ParallaxBG from "@/components/IMG/Heros/Slider4.jpeg";
+import { ShopContext } from "@/components/context/shopContext";
 import { Button, Modal, Form, Input, InputNumber, message, Upload, Popconfirm, Tooltip } from 'antd'; // Thêm Tooltip
 import { PlusOutlined, SearchOutlined, UploadOutlined, DeleteOutlined } from '@ant-design/icons';
-import AdminSidebar from '../Admin/AdminSidebar';
+import AdminSidebar from '@/components/Admin/AdminSidebar';
 
 const EditIcon = () => ( <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500 hover:text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L14.732 3.732z" /></svg> );
 

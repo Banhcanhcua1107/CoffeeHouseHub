@@ -2,8 +2,8 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShopContext } from '../context/shopContext';
-import WrappedAddressAutoComplete from './AddressAutoComplete';
+import { ShopContext } from '@/components/context/shopContext';
+import WrappedAddressAutoComplete from '@/components/page/AddressAutoComplete';
 import { message, Spin } from 'antd';
 
 function Checkout() {

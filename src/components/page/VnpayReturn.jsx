@@ -1,9 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShopContext } from '../context/shopContext';
-import { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12 } from '../IMG/Product/';
-import { S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12 } from '../IMG/Shop/';
-import WrappedAddressAutoComplete from './AddressAutoComplete';
+import { ShopContext } from '@/components/context/shopContext';
+import { P1, P2, P3, P4, P5, P6, P7, P8, P9, P10, P11, P12 } from '@/components/IMG/Product/';
+import { S1, S2, S3, S4, S5, S6, S7, S8, S9, S10, S11, S12 } from '@/components/IMG/Shop/';
+import WrappedAddressAutoComplete from '@/components/page/AddressAutoComplete';
 
 function Checkout() {
   const { cart, user, fetchCart } = useContext(ShopContext);

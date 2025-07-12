@@ -5,8 +5,8 @@ import axios from 'axios';
 import { motion } from 'framer-motion';
 import { FaSearch, FaUserShield, FaUser, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 
-import AdminSidebar from '../Admin/AdminSidebar'; // Chỉnh lại đường dẫn nếu cần
-import { ShopContext } from '../context/shopContext'; // Chỉnh lại đường dẫn nếu cần
+import AdminSidebar from '@/components/Admin/AdminSidebar'; // Chỉnh lại đường dẫn nếu cần
+import { ShopContext } from '@/components/context/ShopContext'; // Chỉnh lại đường dẫn nếu cần
 
 const UserManagementPage = () => {
   const { user, token } = useContext(ShopContext);

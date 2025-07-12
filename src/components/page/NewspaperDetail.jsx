@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import axios from "axios";
-import BlogSidebar from "../page/BlogSidebar";
+import BlogSidebar from "@/components/page/BlogSidebar";
 
 export default function NewspaperDetail() {
   const { id } = useParams();

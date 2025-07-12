@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
-import BlogSidebar from "../page/BlogSidebar";
+import BlogSidebar from "@/components/page/BlogSidebar";
 
-import ParallaxBG from "../IMG/Heros/Slider4.jpeg";
-import "../CSS/Parallax.css";
+import ParallaxBG from "@/components/img/Heros/slider4.jpeg";
+import "@/components/css/Parallax.css";
 
 export default function AllNewsPage() {
   const [news, setNews] = useState([]);

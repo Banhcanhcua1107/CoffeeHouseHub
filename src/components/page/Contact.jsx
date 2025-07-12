@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from 'axios';
-import { ShopContext } from '../context/shopContext';
+import { ShopContext } from '@/components/context/shopContext';
 import { Button, Modal, Form, Input, message, Tag, Empty, Spin } from 'antd';
-import AdminSidebar from '../Admin/AdminSidebar';
+import AdminSidebar from '@/components/Admin/AdminSidebar';
 
 // Import Parallax và CSS
-import ParallaxBG from "../IMG/Heros/Slider4.jpeg";
-import "../CSS/Parallax.css";
+import ParallaxBG from "@/components/img/Heros/slider4.jpeg";
+import "@/components/css/Parallax.css";
 
 // --- COMPONENT CHO KHÁCH HÀNG ---
 const UserContactForm = () => {

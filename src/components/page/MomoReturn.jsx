@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ShopContext } from '../context/shopContext';
+import { ShopContext } from '@/components/context/ShopContext';
 
 function MomoReturn() {
   const navigate = useNavigate();
