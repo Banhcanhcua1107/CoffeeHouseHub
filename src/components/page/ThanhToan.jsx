@@ -2,7 +2,7 @@
 
 import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShopContext } from '@/components/context/shopContext';
+import { ShopContext } from '@/components/context/ShopContext';
 import WrappedAddressAutoComplete from '@/components/page/AddressAutoComplete';
 import { message, Spin } from 'antd';
 

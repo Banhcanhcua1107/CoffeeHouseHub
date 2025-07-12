@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from 'axios';
-import { ShopContext } from '@/components/context/shopContext';
+import { ShopContext } from '@/components/context/ShopContext';
 import { Button, Modal, Form, Input, message, Tag, Empty, Spin } from 'antd';
 import AdminSidebar from '@/components/Admin/AdminSidebar';
 

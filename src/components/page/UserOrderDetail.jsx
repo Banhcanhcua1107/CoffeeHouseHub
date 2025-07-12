@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
-import { ShopContext } from '@/components/context/shopContext';
+import { ShopContext } from '@/components/context/ShopContext';
 import { Spin, message, Button, Alert, Modal, Tag, Select, Space, Input } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 
