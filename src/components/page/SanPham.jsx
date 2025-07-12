@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { ShopContext } from "@/components/context/shopContext";
+import { ShopContext } from "@/components/context/ShopContext";
 import ParallaxBG from "@/components/img/Heros/slider4.jpeg";
 import "@/components/css/Parallax.css";
 import { Button, Modal, Form, Input, InputNumber, Switch, message, Upload, Tooltip, Popconfirm } from 'antd';
