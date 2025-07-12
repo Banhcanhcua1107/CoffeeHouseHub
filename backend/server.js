@@ -60,7 +60,8 @@ const app = express();
 
 const allowedOrigins = [
   'https://coffeehousehub-production.up.railway.app',
-  'https://coffe-website-nine.vercel.app',
+  'https://coffee-backend.up.railway.app',
+  'http://localhost:5173',
 ];
 
 app.use(express.json());
