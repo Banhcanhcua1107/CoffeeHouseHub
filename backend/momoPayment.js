@@ -47,9 +47,16 @@ router.post('/create', async (req, res) => {
     "&requestId=" + requestId +
     "&requestType=" + requestType;
 
+  // Debug raw signature
+  console.log('🔑 Raw Signature String:', rawSignature);
+  console.log('🗝️ Secret Key:', secretKey);
+  console.log('📏 Secret Key Length:', secretKey ? secretKey.length : 'MISSING');
+
   const signature = crypto.createHmac('sha256', secretKey)
     .update(rawSignature)
     .digest('hex');
+
+  console.log('🔐 Generated Signature:', signature);
 
   const requestBody = {
     partnerCode,
