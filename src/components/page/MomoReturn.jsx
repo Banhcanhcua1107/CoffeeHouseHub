@@ -33,6 +33,12 @@ function MomoReturn() {
       const amount = searchParams.get("amount");
       setOrderDetails({ orderId, amount: Number(amount) || 0 });
 
+      // Debug log
+      console.log('🔍 MoMo Return Debug:');
+      console.log('📋 All Search Params:', Object.fromEntries(searchParams));
+      console.log('🆔 Order ID:', orderId);
+      console.log('💰 Amount:', amount);
+
       try {
         const response = await fetch('https://coffeehousehub-production.up.railway.app/momo/verify-and-send-mail', {
           method: 'POST',
@@ -41,6 +47,9 @@ function MomoReturn() {
         });
 
         const data = await response.json();
+        
+        console.log('🌐 API Response Status:', response.status);
+        console.log('📤 API Response Data:', data);
 
         if (response.ok && data.success) {
           setPageStatus({
@@ -58,6 +67,7 @@ function MomoReturn() {
           });
         }
       } catch (error) {
+        console.error('❌ MoMo Return Error:', error);
         setPageStatus({
           isLoading: false,
           isSuccess: false,
