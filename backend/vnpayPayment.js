@@ -7,13 +7,50 @@ const config = require('config');
 const mysql = require('mysql2');
 const { sendReceiptEmail } = require('./sendMailHelper'); // Import hàm gửi mail
 
-// Kết nối DB (đảm bảo thông tin kết nối là đúng)
-const db = mysql.createPool({
-    host: "localhost",
-    user: "root",
-    password: "1234",
-    database: "coffee_website"
-}).promise();
+// Kết nối DB sử dụng biến môi trường
+let dbConfig;
+if (process.env.DATABASE_URL) {
+    const url = new URL(process.env.DATABASE_URL);
+    dbConfig = {
+        host: url.hostname,
+        user: url.username,
+        password: url.password,
+        database: url.pathname.slice(1),
+        port: url.port || 3306,
+        ssl: { rejectUnauthorized: false }
+    };
+} else if (process.env.MYSQL_URL) {
+    const url = new URL(process.env.MYSQL_URL);
+    dbConfig = {
+        host: url.hostname,
+        user: url.username,
+        password: url.password,
+        database: url.pathname.slice(1),
+        port: url.port || 3306,
+        ssl: { rejectUnauthorized: false }
+    };
+} else if (process.env.MYSQLHOST) {
+    dbConfig = {
+        host: process.env.MYSQLHOST,
+        user: process.env.MYSQLUSER,
+        password: process.env.MYSQLPASSWORD,
+        database: process.env.MYSQLDATABASE,
+        port: parseInt(process.env.MYSQLPORT) || 3306,
+        ssl: { rejectUnauthorized: false }
+    };
+} else {
+    // Fallback to hardcoded Railway values
+    dbConfig = {
+        host: 'shortline.proxy.rlwy.net',
+        user: 'root',
+        password: 'KdzwBLtuALXhcyhypAILUdOUmimnmKOM',
+        database: 'railway',
+        port: 43930,
+        ssl: { rejectUnauthorized: false }
+    };
+}
+
+const db = mysql.createPool(dbConfig).promise();
 
 function sortObject(obj) {
     let sorted = {};
@@ -111,7 +148,7 @@ router.get('/vnpay_return', function (req, res, next) {
     let hmac = crypto.createHmac("sha512", secretKey);
     let signed = hmac.update(new Buffer.from(signData, 'utf-8')).digest("hex");
 
-    const frontendReturnUrl = 'http://localhost:5173/checkout/vnpay-return';
+    const frontendReturnUrl = 'https://coffeehousehub-production.up.railway.app/checkout/vnpay-return';
     const queryParams = querystring.stringify(req.query, { encode: true });
 
     if (secureHash === signed) {

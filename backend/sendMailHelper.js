@@ -56,7 +56,7 @@ function sendReceiptEmail({ to, orderId, amount, time, orderInfo, fullname, phon
     `,
     attachments: [{
         filename: 'bienlaigmail.png',
-        path: path.join(__dirname, '..', 'src', 'components', 'IMG', 'LOGOCOFFE', 'bienlaigmail.png'),
+        path: path.join(__dirname, '..', 'src', 'components', 'img', 'LOGOCOFFE', 'bienlaigmail.png'),
         cid: 'logo-bien-lai'
     }]
   };
