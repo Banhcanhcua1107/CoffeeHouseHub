@@ -753,6 +753,7 @@ app.post('/momo/verify-and-send-mail', async (req, res) => {
         });
 
         console.log(`[SUCCESS] Đã xử lý thành công đơn hàng mới ${orderId}.`);
+        console.log(`[INFO] Giỏ hàng của user ${customerInfo.userId} đã được clear.`);
         return res.json({ success: true, message: 'Đã tạo đơn hàng và gửi email thành công.' });
 
     } catch (err) {

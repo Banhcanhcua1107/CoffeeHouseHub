@@ -87,24 +87,27 @@ export const ShopProvider = ({ children }) => {
   
   const fetchCart = useCallback(async () => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) return [];
 
     try {
         const res = await axios.get(`${API_BASE_URL}/cart/select`, {
             headers: { Authorization: `Bearer ${token}` }
         });
         setCart(res.data);
+        return res.data;
     } catch (err) {
         console.error("Lỗi khi tải giỏ hàng:", err);
         if (err.response?.status === 401 || err.response?.status === 403) {
             updateUser(null); // Token hết hạn, tự động đăng xuất
         }
+        setCart([]);
+        return [];
     }
   }, []);
 
   const fetchNotifications = useCallback(async () => {
     const token = localStorage.getItem('token');
-    if (!token) return;
+    if (!token) return [];
     
     try {
         const res = await axios.get(`${API_BASE_URL}/notifications`, {
@@ -112,8 +115,12 @@ export const ShopProvider = ({ children }) => {
         });
         setNotifications(res.data);
         setUnreadCount(res.data.filter(n => !n.is_read).length);
+        return res.data;
     } catch (err) {
         console.error("Lỗi khi tải thông báo:", err);
+        setNotifications([]);
+        setUnreadCount(0);
+        return [];
     }
   }, []);
 

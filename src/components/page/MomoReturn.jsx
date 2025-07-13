@@ -57,8 +57,21 @@ function MomoReturn() {
             isSuccess: true,
             message: "Thanh toán và xử lý đơn hàng thành công!",
           });
-          fetchCart();
-          fetchNotifications();
+          
+          // Cập nhật giỏ hàng và thông báo
+          await fetchCart();
+          await fetchNotifications();
+          
+          // Chờ 2 giây rồi redirect về trang chủ với thông báo thành công
+          setTimeout(() => {
+            navigate('/', { 
+              state: { 
+                momoSuccess: true,
+                orderCode: orderId,
+                amount: amount 
+              }
+            });
+          }, 2000);
         } else {
           setPageStatus({
             isLoading: false,

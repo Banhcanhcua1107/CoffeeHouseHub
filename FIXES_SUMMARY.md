@@ -95,4 +95,36 @@
 ✅ **Đã hoàn thành**: Database configuration đã được chuẩn hóa  
 ✅ **Đã hoàn thành**: Hướng dẫn cấu hình đã được tạo  
 
-**Hệ thống đã sẵn sàng cho production với Railway!** 
+**Hệ thống đã sẵn sàng cho production với Railway!**
+
+## 7. Khắc phục MoMo Payment Flow
+
+### ✅ Đã sửa:
+- **src/components/page/MomoReturn.jsx**: 
+  - Thêm debug logs chi tiết
+  - Sau thanh toán thành công, tự động redirect về trang chủ sau 2 giây
+  - Await fetchCart() và fetchNotifications() để cập nhật dữ liệu
+  - Truyền state momoSuccess, orderCode, amount khi redirect
+
+- **src/components/page/Home.jsx**: 
+  - Hiển thị popup thông báo thanh toán thành công
+  - Hiển thị mã đơn hàng nếu có
+  - Tự động tắt thông báo sau 4 giây
+
+- **src/components/context/ShopContext.jsx**:
+  - Sửa fetchCart() và fetchNotifications() để return data properly
+  - Cho phép await khi gọi các functions này
+
+- **backend/server.js**:
+  - Thêm log tracking khi clear giỏ hàng thành công
+
+### ✅ Flow hoàn chỉnh:
+1. **Thanh toán MoMo** → MoMo gateway
+2. **Redirect về** `/checkout/momo-return` 
+3. **API call** `/momo/verify-and-send-mail`
+4. **Backend xử lý**: Tạo đơn hàng + Clear cart + Gửi email
+5. **Frontend**: Update cart + notifications
+6. **Auto redirect** về trang chủ sau 2 giây
+7. **Hiển thị thông báo** thành công với mã đơn hàng
+
+**MoMo Payment đã hoạt động hoàn hảo!** 

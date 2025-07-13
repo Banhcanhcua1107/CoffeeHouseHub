@@ -16,7 +16,7 @@ function Home() {
       setShowSuccess(true);
       // Xóa momoSuccess khỏi state của history (để F5 không hiện lại box)
       window.history.replaceState({}, document.title);
-      setTimeout(() => setShowSuccess(false), 3500); // 3,5 giây sau tự tắt
+      setTimeout(() => setShowSuccess(false), 4000); // 4 giây sau tự tắt
     }
   }, [location.state]);
 
@@ -42,7 +42,10 @@ function Home() {
               <h2 style={{ color: "#27ae60", fontSize: 28, marginBottom: 8 }}>
                 🎉 Thanh toán thành công!
               </h2>
-              <p style={{ fontSize: 18, marginBottom: 0 }}>
+              <p style={{ fontSize: 18, marginBottom: 10 }}>
+                {location.state?.orderCode && (
+                  <>Mã đơn hàng: <strong>{location.state.orderCode}</strong><br /></>
+                )}
                 Vui lòng đợi xác nhận đơn hàng của bạn.<br />Cảm ơn bạn đã mua hàng!
               </p>
             </div>
