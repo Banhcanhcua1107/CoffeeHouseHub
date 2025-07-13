@@ -29,7 +29,7 @@
     "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
-    "daisyui": "^5.0.35",
+    "daisyui": "^4.4.19",
     "dotenv": "^17.0.1",
     "express": "^5.1.0",
     "framer-motion": "^12.23.0",

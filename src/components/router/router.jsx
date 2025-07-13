@@ -30,6 +30,7 @@ function AppRoutes() {
         <Route path="/checkout" element={<Checkout />} />
         <Route path="/checkout/momo-return" element={<MomoReturn />} />
         <Route path="/checkout/thank-you" element={<ThankYouPage />} />
+        {/* <Route path="/checkout/vnpay-return" element={<VnpayReturn />} /> */}
         <Route path="/menu" element={<Menu />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/contact" element={<Contact />} />
