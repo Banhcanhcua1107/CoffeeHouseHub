@@ -4,22 +4,22 @@ import React, { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { ShopContext } from '@/components/context/ShopContext';
 
+import React, { useEffect, useRef, useState, useContext } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ShopContext } from '@/components/context/ShopContext';
+import axios from 'axios';
+import { Spin } from 'antd';
+
 function MomoReturn() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const { fetchCart, fetchNotifications } = useContext(ShopContext);
-
   const isProcessing = useRef(false);
 
   const [pageStatus, setPageStatus] = useState({
     isLoading: true,
     isSuccess: false,
     message: "Đang xử lý kết quả thanh toán...",
-  });
-
-  const [orderDetails, setOrderDetails] = useState({
-    orderId: '',
-    amount: 0,
   });
 
   useEffect(() => {
@@ -29,9 +29,72 @@ function MomoReturn() {
     isProcessing.current = true;
 
     const processPaymentResult = async () => {
-      const orderId = searchParams.get("orderId");
-      const amount = searchParams.get("amount");
-      const resultCode = searchParams.get("resultCode");
+      try {
+        const orderId = searchParams.get("orderId");
+        const amount = searchParams.get("amount");
+        const resultCode = searchParams.get("resultCode");
+        
+        console.log('MomoReturn Parameters:', { orderId, amount, resultCode });
+        
+        // Nếu không có orderId hoặc amount, chuyển về trang chủ
+        if (!orderId || !amount) {
+          console.error("Missing required parameters");
+          navigate('/', { replace: true });
+          return;
+        }
+
+        if (resultCode === "0") {
+          // Thanh toán thành công
+          try {
+            // Gọi API để verify và cập nhật trạng thái đơn hàng
+            const response = await axios.post('https://coffeehousehub-production.up.railway.app/momo/verify-and-send-mail', {
+              orderId,
+              amount,
+              resultCode
+            });
+
+            if (response.data.success) {
+              await Promise.all([fetchCart(), fetchNotifications()]);
+              
+              // Chuyển đến trang cảm ơn
+              navigate('/checkout/thank-you', {
+                state: {
+                  orderCode: orderId,
+                  amount: Number(amount)
+                },
+                replace: true
+              });
+            } else {
+              throw new Error('Verification failed');
+            }
+          } catch (error) {
+            console.error('Error processing payment:', error);
+            navigate('/', { 
+              state: { 
+                error: 'Có lỗi xảy ra khi xử lý thanh toán. Vui lòng liên hệ hỗ trợ.' 
+              },
+              replace: true
+            });
+          }
+        } else {
+          // Thanh toán thất bại hoặc bị hủy
+          console.log('Payment failed or cancelled');
+          navigate('/', { 
+            state: { 
+              error: 'Thanh toán đã bị hủy hoặc thất bại.' 
+            },
+            replace: true
+          });
+        }
+      } catch (error) {
+        console.error('Error in processPaymentResult:', error);
+        navigate('/', { 
+          state: { 
+            error: 'Có lỗi xảy ra. Vui lòng thử lại sau.' 
+          },
+          replace: true 
+        });
+      }
       
       setOrderDetails({ orderId, amount: Number(amount) || 0 });
 
