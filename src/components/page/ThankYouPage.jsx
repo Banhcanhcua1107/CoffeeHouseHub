@@ -1,6 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef, useContext } from 'react';
-import { ShopContext } from '../context/ShopContext';
+import { ShopContext } from '@/components/context/ShopContext';
 
 function ThankYouPage() {
   const navigate = useNavigate();
@@ -103,3 +103,5 @@ function ThankYouPage() {
     </div>
   );
 }
+
+export default ThankYouPage;
