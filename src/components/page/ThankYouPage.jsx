@@ -1,31 +1,64 @@
 // --- START OF FILE ThankYouPage.jsx ---
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
+
 
 function ThankYouPage() {
   const navigate = useNavigate();
   const location = useLocation();
+  const [orderInfo, setOrderInfo] = useState({ orderCode: '', amount: 0, momoSuccess: false });
+  const [checking, setChecking] = useState(true);
 
-  // Lấy thông tin đơn hàng được truyền qua state khi chuyển hướng
-  const orderDetails = location.state || {};
-  // Nếu là thanh toán momo thì lấy từ state momoSuccess, nếu không thì lấy orderCode và amount
-  const { orderCode, amount, momoSuccess } = orderDetails;
-
-  // Nếu người dùng truy cập trực tiếp vào trang này mà không có thông tin đơn hàng,
-  // chuyển hướng họ về trang chủ.
   useEffect(() => {
-    // Nếu không có thông tin đơn hàng (cả momo và cod), chuyển hướng về trang chủ
-    if ((!orderCode || !amount) && !momoSuccess) {
-      console.log("Không có thông tin đơn hàng, đang chuyển hướng...");
+    // Ưu tiên lấy từ location.state, nếu không có thì lấy từ localStorage
+    let stateOrder = location.state;
+    if (stateOrder && (stateOrder.orderCode || stateOrder.momoSuccess)) {
+      setOrderInfo({
+        orderCode: stateOrder.orderCode,
+        amount: stateOrder.amount,
+        momoSuccess: stateOrder.momoSuccess || false
+      });
+      // Lưu vào localStorage để reload không bị mất
+      localStorage.setItem('thankYouOrder', JSON.stringify({
+        orderCode: stateOrder.orderCode,
+        amount: stateOrder.amount,
+        momoSuccess: stateOrder.momoSuccess || false
+      }));
+      setChecking(false);
+    } else {
+      // Lấy từ localStorage nếu có
+      const saved = localStorage.getItem('thankYouOrder');
+      if (saved) {
+        try {
+          const parsed = JSON.parse(saved);
+          if (parsed.orderCode || parsed.momoSuccess) {
+            setOrderInfo({
+              orderCode: parsed.orderCode,
+              amount: parsed.amount,
+              momoSuccess: parsed.momoSuccess || false
+            });
+            setChecking(false);
+            return;
+          }
+        } catch (e) {
+          localStorage.removeItem('thankYouOrder');
+        }
+      }
+      // Không có thông tin, chuyển hướng về trang chủ
       navigate('/');
     }
-  }, [orderCode, amount, momoSuccess, navigate]);
+  }, [location.state, navigate]);
 
-  // Nếu chưa có thông tin, không render gì để chờ chuyển hướng
-  if ((!orderCode || !amount) && !momoSuccess) {
-    return null;
-  }
+  // Xóa localStorage khi đã hiển thị xong (chỉ xóa khi đã có orderCode hoặc momoSuccess)
+  useEffect(() => {
+    if ((orderInfo.orderCode || orderInfo.momoSuccess) && !checking) {
+      localStorage.removeItem('thankYouOrder');
+    }
+  }, [orderInfo, checking]);
+
+  if (checking) return null;
+  if ((!orderInfo.orderCode || !orderInfo.amount) && !orderInfo.momoSuccess) return null;
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#F9F5F0] to-[#E8D9C5] flex items-center justify-center p-4">
@@ -50,9 +83,9 @@ function ThankYouPage() {
 
           <div className="bg-[#F9F5F0] rounded-lg p-4 my-6 text-left">
             <h3 className="font-medium text-[#A47148] mb-2">Thông tin đơn hàng</h3>
-            <p className="text-sm text-gray-600">• Mã đơn hàng: <span className="font-semibold">{orderCode}</span></p>
-            <p className="text-sm text-gray-600">• Tổng tiền: <span className="font-semibold">{(amount || 0).toLocaleString('vi-VN')}đ</span></p>
-            <p className="text-sm text-gray-600">• Hình thức: <span className="font-semibold">{momoSuccess ? 'Thanh toán MoMo' : 'Thanh toán khi nhận hàng (COD)'}</span></p>
+            <p className="text-sm text-gray-600">• Mã đơn hàng: <span className="font-semibold">{orderInfo.orderCode}</span></p>
+            <p className="text-sm text-gray-600">• Tổng tiền: <span className="font-semibold">{(orderInfo.amount || 0).toLocaleString('vi-VN')}đ</span></p>
+            <p className="text-sm text-gray-600">• Hình thức: <span className="font-semibold">{orderInfo.momoSuccess ? 'Thanh toán MoMo' : 'Thanh toán khi nhận hàng (COD)'}</span></p>
           </div>
 
           <button
