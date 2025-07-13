@@ -1,108 +1,105 @@
-// --- START OF FILE ThankYouPage.jsx ---
-
-import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-
+import { useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState, useRef, useContext } from 'react';
+import { ShopContext } from '../context/ShopContext';
 
 function ThankYouPage() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [orderInfo, setOrderInfo] = useState({ orderCode: '', amount: 0, momoSuccess: false });
-  const [checking, setChecking] = useState(true);
+  const { fetchCart, fetchNotifications } = useContext(ShopContext);
+  const isProcessing = useRef(false);
+
+  const [orderDetails, setOrderDetails] = useState({ orderCode: '', amount: 0 });
+  const [pageStatus, setPageStatus] = useState({
+    isLoading: true,
+    isSuccess: false,
+    message: 'Đang xử lý đơn hàng...'
+  });
 
   useEffect(() => {
-    // Ưu tiên lấy từ location.state, nếu không có thì lấy từ localStorage
+    if (isProcessing.current) return;
+    isProcessing.current = true;
+
+    // Lấy thông tin đơn hàng từ location.state hoặc localStorage
     let stateOrder = location.state;
-    if (stateOrder && (stateOrder.orderCode || stateOrder.momoSuccess)) {
-      setOrderInfo({
-        orderCode: stateOrder.orderCode,
-        amount: stateOrder.amount,
-        momoSuccess: stateOrder.momoSuccess || false
-      });
-      // Lưu vào localStorage để reload không bị mất
-      localStorage.setItem('thankYouOrder', JSON.stringify({
-        orderCode: stateOrder.orderCode,
-        amount: stateOrder.amount,
-        momoSuccess: stateOrder.momoSuccess || false
-      }));
-      setChecking(false);
+    let orderCode = '';
+    let amount = 0;
+    if (stateOrder && stateOrder.orderCode && stateOrder.amount) {
+      orderCode = stateOrder.orderCode;
+      amount = stateOrder.amount;
+      localStorage.setItem('thankYouOrder', JSON.stringify({ orderCode, amount }));
     } else {
-      // Lấy từ localStorage nếu có
       const saved = localStorage.getItem('thankYouOrder');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          if (parsed.orderCode || parsed.momoSuccess) {
-            setOrderInfo({
-              orderCode: parsed.orderCode,
-              amount: parsed.amount,
-              momoSuccess: parsed.momoSuccess || false
-            });
-            setChecking(false);
-            return;
-          }
-        } catch (e) {
-          localStorage.removeItem('thankYouOrder');
-        }
+          orderCode = parsed.orderCode;
+          amount = parsed.amount;
+        } catch (e) {}
       }
-      // Không có thông tin, chuyển hướng về trang chủ
-      navigate('/');
     }
-  }, [location.state, navigate]);
 
-  // Xóa localStorage khi đã hiển thị xong (chỉ xóa khi đã có orderCode hoặc momoSuccess)
-  useEffect(() => {
-    if ((orderInfo.orderCode || orderInfo.momoSuccess) && !checking) {
+    if (!orderCode || !amount) {
+      setPageStatus({
+        isLoading: false,
+        isSuccess: false,
+        message: 'Không tìm thấy thông tin đơn hàng. Vui lòng đặt lại đơn hàng.'
+      });
+      setTimeout(() => navigate('/gio-hang', { replace: true }), 2000);
+      return;
+    }
+
+    setOrderDetails({ orderCode, amount });
+    setPageStatus({
+      isLoading: false,
+      isSuccess: true,
+      message: 'Đặt hàng thành công!'
+    });
+    // Cập nhật lại giỏ hàng và thông báo
+    fetchCart && fetchCart();
+    fetchNotifications && fetchNotifications();
+    // Xóa localStorage sau khi hiển thị
+    setTimeout(() => {
       localStorage.removeItem('thankYouOrder');
-    }
-  }, [orderInfo, checking]);
+    }, 3000);
+  }, [location.state, navigate, fetchCart, fetchNotifications]);
 
-  if (checking) return null;
-  if ((!orderInfo.orderCode || !orderInfo.amount) && !orderInfo.momoSuccess) return null;
+  if (pageStatus.isLoading) {
+    return (
+      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center' }}>
+          <h2 style={{ color: '#A47148', marginBottom: 12 }}>Đang xử lý đơn hàng...</h2>
+          <div className="loader" />
+        </div>
+      </div>
+    );
+  }
 
+  if (!pageStatus.isSuccess) {
+    return (
+      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center' }}>
+          <h2 style={{ color: '#E03E2D', marginBottom: 12 }}>Lỗi</h2>
+          <p>{pageStatus.message}</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Hiển thị thông tin đơn hàng thành công
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F9F5F0] to-[#E8D9C5] flex items-center justify-center p-4">
-      <div className="bg-white rounded-2xl shadow-lg overflow-hidden w-full max-w-md">
-        {/* Header thành công */}
-        <div className="bg-[#A47148] p-6 text-center relative">
-          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80')] opacity-20"></div>
-          <div className="relative z-10">
-            <svg className="w-20 h-20 mx-auto text-green-100" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <h1 className="text-2xl font-bold text-white mt-4">Đặt Hàng Thành Công!</h1>
-          </div>
-        </div>
-
-        {/* Body hiển thị thông tin */}
-        <div className="p-6 text-center">
-          <h2 className="text-xl font-semibold mb-2 text-[#A47148]">
-            Cảm ơn bạn đã tin tưởng và đặt hàng.
-          </h2>
-          <p className="text-gray-600 mb-6">Chúng tôi sẽ xử lý đơn hàng của bạn trong thời gian sớm nhất.</p>
-
-          <div className="bg-[#F9F5F0] rounded-lg p-4 my-6 text-left">
-            <h3 className="font-medium text-[#A47148] mb-2">Thông tin đơn hàng</h3>
-            <p className="text-sm text-gray-600">• Mã đơn hàng: <span className="font-semibold">{orderInfo.orderCode}</span></p>
-            <p className="text-sm text-gray-600">• Tổng tiền: <span className="font-semibold">{(orderInfo.amount || 0).toLocaleString('vi-VN')}đ</span></p>
-            <p className="text-sm text-gray-600">• Hình thức: <span className="font-semibold">{orderInfo.momoSuccess ? 'Thanh toán MoMo' : 'Thanh toán khi nhận hàng (COD)'}</span></p>
-          </div>
-
-          <button
-            onClick={() => navigate('/')}
-            className="w-full py-3 px-4 rounded-lg font-medium text-white transition-colors duration-300 bg-[#A47148] hover:bg-[#8a5f3a]"
-          >
-            Tiếp tục mua sắm
-          </button>
-
-          <div className="mt-6 pt-4 border-t border-gray-200">
-            <p className="text-sm text-gray-500">Cần hỗ trợ?</p>
-            <p className="text-sm font-medium text-[#A47148]">info@coffeehouse.com | 028 7100 1888</p>
-          </div>
-        </div>
+    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center', maxWidth: 420 }}>
+        <h2 style={{ color: '#27ae60', fontSize: 28, marginBottom: 8 }}>🎉 Đặt hàng thành công!</h2>
+        <p style={{ fontSize: 18, marginBottom: 10 }}>
+          Mã đơn hàng: <strong>{orderDetails.orderCode}</strong><br />
+          Số tiền: <strong>{Number(orderDetails.amount).toLocaleString('vi-VN')}đ</strong><br />
+          Cảm ơn bạn đã mua hàng tại Coffee House!<br />
+          Vui lòng đợi xác nhận đơn hàng của bạn.
+        </p>
+        <button style={{ marginTop: 18, padding: '8px 24px', background: '#A47148', color: '#fff', border: 'none', borderRadius: 6, fontSize: 16, cursor: 'pointer' }}
+          onClick={() => navigate('/')}
+        >Về trang chủ</button>
       </div>
     </div>
   );
 }
-
-export default ThankYouPage;
