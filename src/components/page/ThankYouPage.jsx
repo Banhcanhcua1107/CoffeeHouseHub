@@ -22,14 +22,12 @@ function ThankYouPage() {
     let foundOrder = false;
     let code, amt;
 
-    // Ưu tiên lấy từ location.state
     if (location.state?.orderCode && location.state?.amount) {
       code = location.state.orderCode;
       amt = location.state.amount;
       localStorage.setItem('thankYouOrder', JSON.stringify({ orderCode: code, amount: amt }));
       foundOrder = true;
     } else {
-      // Fallback từ localStorage
       const saved = localStorage.getItem('thankYouOrder');
       if (saved) {
         try {
@@ -48,7 +46,6 @@ function ThankYouPage() {
         isSuccess: true,
         message: 'Đặt hàng thành công!'
       });
-      // Cập nhật lại cart & notification
       fetchCart && fetchCart();
       fetchNotifications && fetchNotifications();
     } else {
@@ -65,9 +62,9 @@ function ThankYouPage() {
   if (pageStatus.isLoading) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center' }}>
-          <h2 style={{ color: '#A47148', marginBottom: 12 }}>Đang xử lý đơn hàng...</h2>
+        <div style={{ background: '#fff', padding: 40, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center' }}>
           <div className="loader" />
+          <h2 style={{ color: '#A47148', marginTop: 16 }}>Đang xử lý đơn hàng...</h2>
         </div>
       </div>
     );
@@ -76,7 +73,7 @@ function ThankYouPage() {
   if (!pageStatus.isSuccess) {
     return (
       <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center' }}>
+        <div style={{ background: '#fff', padding: 40, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center' }}>
           <h2 style={{ color: '#E03E2D', marginBottom: 12 }}>Lỗi</h2>
           <p>{pageStatus.message}</p>
         </div>
@@ -86,17 +83,47 @@ function ThankYouPage() {
 
   return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center', maxWidth: 420 }}>
-        <h2 style={{ color: '#27ae60', fontSize: 28, marginBottom: 8 }}>🎉 Đặt hàng thành công!</h2>
-        <p style={{ fontSize: 18, marginBottom: 10 }}>
-          Mã đơn hàng: <strong>{orderDetails.orderCode}</strong><br />
-          Số tiền: <strong>{Number(orderDetails.amount).toLocaleString('vi-VN')}đ</strong><br />
-          Cảm ơn bạn đã mua hàng tại Coffee House!<br />
-          Vui lòng đợi xác nhận đơn hàng của bạn.
-        </p>
-        <button style={{ marginTop: 18, padding: '8px 24px', background: '#A47148', color: '#fff', border: 'none', borderRadius: 6, fontSize: 16, cursor: 'pointer' }}
+      <div style={{
+        background: '#fff',
+        padding: 40,
+        borderRadius: 16,
+        boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
+        textAlign: 'center',
+        maxWidth: 400
+      }}>
+        <div style={{
+          width: 80,
+          height: 80,
+          borderRadius: '50%',
+          background: '#e0f7ec',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          margin: '0 auto 20px'
+        }}>
+          <span style={{ fontSize: 42, color: '#27ae60' }}>✓</span>
+        </div>
+        <h2 style={{ color: '#27ae60', fontSize: 24, marginBottom: 12 }}>Thanh toán thành công!</h2>
+        <div style={{ fontSize: 16, color: '#555', lineHeight: '1.6' }}>
+          <div><strong>Mã đơn:</strong> {orderDetails.orderCode}</div>
+          <div><strong>Số tiền:</strong> {Number(orderDetails.amount).toLocaleString('vi-VN')}đ</div>
+          <div style={{ marginTop: 8 }}>Cảm ơn bạn đã mua hàng tại Coffee House!</div>
+        </div>
+        <button
           onClick={() => navigate('/')}
-        >Về trang chủ</button>
+          style={{
+            marginTop: 24,
+            padding: '12px 36px',
+            background: '#A47148',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            fontSize: 16,
+            cursor: 'pointer'
+          }}
+        >
+          Về trang chủ
+        </button>
       </div>
     </div>
   );
