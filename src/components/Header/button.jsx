@@ -217,9 +217,9 @@ function BTN() {
         className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]"
         required
       />
-      {/* Thông báo lỗi tiếng Việt ngay trên nút */}
+      {/* Thông báo lỗi tiếng Việt căn trái, đều với input và nút */}
       {formErrors.login && (
-        <div className="text-red-500 text-sm mb-2 text-center">{formErrors.login === "Invalid email or password" ? "Email hoặc mật khẩu không đúng" : formErrors.login}</div>
+        <div className="text-red-500 text-sm w-full text-left pl-1">{formErrors.login === "Invalid email or password" ? "Email hoặc mật khẩu không đúng" : formErrors.login}</div>
       )}
       <button type="submit" className="w-full bg-[#A47148] text-white py-2 rounded hover:bg-[#D9A074] transition font-semibold" disabled={loading}>
         {loading ? 'Đang xử lý...' : 'Đăng nhập'}
