@@ -44,7 +44,7 @@ function ThankYouPage() {
         isSuccess: false,
         message: 'Không tìm thấy thông tin đơn hàng. Vui lòng đặt lại đơn hàng.'
       });
-      setTimeout(() => navigate('/gio-hang', { replace: true }), 2000);
+      setTimeout(() => navigate('/thankYouOrder', { replace: true }), 2000);
       return;
     }
 
