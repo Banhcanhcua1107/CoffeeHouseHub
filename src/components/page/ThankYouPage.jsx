@@ -19,48 +19,48 @@ function ThankYouPage() {
     if (isProcessing.current) return;
     isProcessing.current = true;
 
-    // Lấy thông tin đơn hàng từ location.state hoặc localStorage
-    let stateOrder = location.state;
-    let orderCode = '';
-    let amount = 0;
-    if (stateOrder && stateOrder.orderCode && stateOrder.amount) {
-      orderCode = stateOrder.orderCode;
-      amount = stateOrder.amount;
-      localStorage.setItem('/thankYouOrder', JSON.stringify({ orderCode, amount }));
+    let foundOrder = false;
+    let code, amt;
+
+    // Lấy từ state khi redirect từ ThanhToan.jsx
+    if (location.state?.orderCode && location.state?.amount) {
+      code = location.state.orderCode;
+      amt = location.state.amount;
+      localStorage.setItem('thankYouOrder', JSON.stringify({ orderCode: code, amount: amt }));
+      foundOrder = true;
     } else {
+      // Fallback từ localStorage khi user reload
       const saved = localStorage.getItem('thankYouOrder');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          orderCode = parsed.orderCode;
-          amount = parsed.amount;
-        } catch (e) {}
+          code = parsed.orderCode;
+          amt = parsed.amount;
+          foundOrder = true;
+        } catch (e) {
+          console.error("Lỗi đọc localStorage thankYouOrder:", e);
+        }
       }
     }
 
-    if (!orderCode || !amount) {
+    if (foundOrder) {
+      setOrderDetails({ orderCode: code, amount: amt });
+      setPageStatus({
+        isLoading: false,
+        isSuccess: true,
+        message: 'Đặt hàng thành công!'
+      });
+      fetchCart && fetchCart();
+      fetchNotifications && fetchNotifications();
+    } else {
       setPageStatus({
         isLoading: false,
         isSuccess: false,
-        message: 'Không tìm thấy thông tin đơn hàng. Vui lòng đặt lại đơn hàng.'
+        message: 'Không tìm thấy thông tin đơn hàng. Vui lòng đặt lại.'
       });
-      setTimeout(() => navigate('/thankYouOrder', { replace: true }), 2000);
-      return;
+      setTimeout(() => navigate('/cart', { replace: true }), 3000);
     }
 
-    setOrderDetails({ orderCode, amount });
-    setPageStatus({
-      isLoading: false,
-      isSuccess: true,
-      message: 'Đặt hàng thành công!'
-    });
-    // Cập nhật lại giỏ hàng và thông báo
-    fetchCart && fetchCart();
-    fetchNotifications && fetchNotifications();
-    // Xóa localStorage sau khi hiển thị
-    setTimeout(() => {
-      localStorage.removeItem('thankYouOrder');
-    }, 3000);
   }, [location.state, navigate, fetchCart, fetchNotifications]);
 
   if (pageStatus.isLoading) {
@@ -85,7 +85,6 @@ function ThankYouPage() {
     );
   }
 
-  // Hiển thị thông tin đơn hàng thành công
   return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center', maxWidth: 420 }}>
