@@ -1,6 +1,7 @@
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useEffect, useState, useRef, useContext } from 'react';
 import { ShopContext } from '@/components/context/ShopContext';
+import { CheckCircle } from 'lucide-react';
 
 function ThankYouPage() {
   const navigate = useNavigate();
@@ -22,14 +23,12 @@ function ThankYouPage() {
     let foundOrder = false;
     let code, amt;
 
-    // Lấy từ state khi redirect từ ThanhToan.jsx
     if (location.state?.orderCode && location.state?.amount) {
       code = location.state.orderCode;
       amt = location.state.amount;
       localStorage.setItem('thankYouOrder', JSON.stringify({ orderCode: code, amount: amt }));
       foundOrder = true;
     } else {
-      // Fallback từ localStorage khi user reload
       const saved = localStorage.getItem('thankYouOrder');
       if (saved) {
         try {
@@ -65,9 +64,9 @@ function ThankYouPage() {
 
   if (pageStatus.isLoading) {
     return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center' }}>
-          <h2 style={{ color: '#A47148', marginBottom: 12 }}>Đang xử lý đơn hàng...</h2>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow-md text-center">
+          <h2 className="text-[#A47148] mb-3 text-lg font-semibold">Đang xử lý đơn hàng...</h2>
           <div className="loader" />
         </div>
       </div>
@@ -76,9 +75,9 @@ function ThankYouPage() {
 
   if (!pageStatus.isSuccess) {
     return (
-      <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center' }}>
-          <h2 style={{ color: '#E03E2D', marginBottom: 12 }}>Lỗi</h2>
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="bg-white p-8 rounded-xl shadow-md text-center">
+          <h2 className="text-red-500 mb-3 text-lg font-semibold">Lỗi</h2>
           <p>{pageStatus.message}</p>
         </div>
       </div>
@@ -86,18 +85,34 @@ function ThankYouPage() {
   }
 
   return (
-    <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center', maxWidth: 420 }}>
-        <h2 style={{ color: '#27ae60', fontSize: 28, marginBottom: 8 }}>🎉 Đặt hàng thành công!</h2>
-        <p style={{ fontSize: 18, marginBottom: 10 }}>
-          Mã đơn hàng: <strong>{orderDetails.orderCode}</strong><br />
-          Số tiền: <strong>{Number(orderDetails.amount).toLocaleString('vi-VN')}đ</strong><br />
-          Cảm ơn bạn đã mua hàng tại Coffee House!<br />
-          Vui lòng đợi xác nhận đơn hàng của bạn.
-        </p>
-        <button style={{ marginTop: 18, padding: '8px 24px', background: '#A47148', color: '#fff', border: 'none', borderRadius: 6, fontSize: 16, cursor: 'pointer' }}
-          onClick={() => navigate('/')}
-        >Về trang chủ</button>
+    <div className="min-h-screen flex items-center justify-center bg-[#f9f6f1] px-4 py-8">
+      <div className="bg-[#fefaf5] rounded-3xl shadow-lg w-full max-w-md overflow-hidden">
+        <div className="bg-[#A47148] text-center p-8 rounded-t-3xl">
+          <div className="flex justify-center mb-4">
+            <div className="bg-[#fefaf5] rounded-full p-3">
+              <CheckCircle size={48} className="text-[#A47148]" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold text-white">Thành Công!</h2>
+        </div>
+
+        <div className="p-8 text-center text-[#5a4735]">
+          <p className="mb-4 text-lg font-medium">Thanh toán và xử lý đơn hàng thành công!</p>
+          <div className="bg-[#f8f5f0] border-l-4 border-[#A47148] p-4 rounded-lg mb-6 text-left">
+            <p><span className="font-semibold">• Mã đơn hàng:</span> <span className="font-bold text-[#A47148]">{orderDetails.orderCode}</span></p>
+            <p><span className="font-semibold">• Tổng tiền:</span> <span className="text-[#A47148]">{Number(orderDetails.amount).toLocaleString('vi-VN')}đ</span></p>
+          </div>
+          <button
+            onClick={() => navigate('/')}
+            className="bg-[#A47148] hover:bg-[#8d5e3f] text-white py-3 px-6 rounded-lg font-medium transition-colors"
+          >
+            Tiếp tục mua sắm
+          </button>
+          <div className="mt-8 text-sm">
+            <p>Cần hỗ trợ?</p>
+            <p className="mt-1 font-semibold">info@coffeehouse.com | 028 7100 1888</p>
+          </div>
+        </div>
       </div>
     </div>
   );
