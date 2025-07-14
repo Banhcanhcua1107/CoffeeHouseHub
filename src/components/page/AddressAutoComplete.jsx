@@ -20,12 +20,12 @@ function AddressAutoComplete({ value, onChange }) {
   // Debounced fetch function
   const debouncedFetch = useCallback(
   debounce(async (text) => {
-    if (!text || text.trim().length < 3) {
+    if (!text || text.trim().length < 2) {
       setSuggestions([]);
       return;
     }
     setLoading(true);
-    const apiKey = import.meta.env.VITE_GEOAPIFY_API_KEY;
+    const apiKey = import.meta.env.VITE_GEOAPIFY_API_KEY || process.env.GEOAPIFY_API_KEY;
     if (!apiKey) {
       console.error("Geoapify API Key is missing in .env file");
       setLoading(false);
