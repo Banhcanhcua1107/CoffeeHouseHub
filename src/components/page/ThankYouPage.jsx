@@ -16,15 +16,20 @@ function ThankYouPage() {
   });
 
   useEffect(() => {
+    if (isProcessing.current) return;
+    isProcessing.current = true;
+
     let foundOrder = false;
     let code, amt;
 
+    // Ưu tiên lấy từ location.state
     if (location.state?.orderCode && location.state?.amount) {
       code = location.state.orderCode;
       amt = location.state.amount;
       localStorage.setItem('thankYouOrder', JSON.stringify({ orderCode: code, amount: amt }));
       foundOrder = true;
     } else {
+      // Fallback từ localStorage
       const saved = localStorage.getItem('thankYouOrder');
       if (saved) {
         try {
@@ -38,13 +43,24 @@ function ThankYouPage() {
 
     if (foundOrder) {
       setOrderDetails({ orderCode: code, amount: amt });
-      setPageStatus({ isLoading: false, isSuccess: true, message: 'Đặt hàng thành công!' });
+      setPageStatus({
+        isLoading: false,
+        isSuccess: true,
+        message: 'Đặt hàng thành công!'
+      });
+      // Cập nhật lại cart & notification
+      fetchCart && fetchCart();
+      fetchNotifications && fetchNotifications();
     } else {
-      setPageStatus({ isLoading: false, isSuccess: false, message: 'Không tìm thấy thông tin đơn hàng.' });
+      setPageStatus({
+        isLoading: false,
+        isSuccess: false,
+        message: 'Không tìm thấy thông tin đơn hàng. Vui lòng đặt lại.'
+      });
       setTimeout(() => navigate('/gio-hang', { replace: true }), 3000);
     }
-  }, [location.state, navigate]);
 
+  }, [location.state, navigate, fetchCart, fetchNotifications]);
 
   if (pageStatus.isLoading) {
     return (
@@ -68,7 +84,6 @@ function ThankYouPage() {
     );
   }
 
-  // Hiển thị thông tin đơn hàng thành công
   return (
     <div style={{ minHeight: '60vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: '#fff', padding: 32, borderRadius: 12, boxShadow: '0 2px 16px #0001', textAlign: 'center', maxWidth: 420 }}>
