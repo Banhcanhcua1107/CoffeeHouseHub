@@ -13,7 +13,7 @@ const UserOrderDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthLoading } = useContext(ShopContext);
-  const userId = user?.id;
+  // const userId = user?.id;
 
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
