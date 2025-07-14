@@ -26,7 +26,7 @@ function ThankYouPage() {
     if (stateOrder && stateOrder.orderCode && stateOrder.amount) {
       orderCode = stateOrder.orderCode;
       amount = stateOrder.amount;
-      localStorage.setItem('/thankYouOrder', JSON.stringify({ orderCode, amount }));
+      localStorage.setItem('thankYouOrder', JSON.stringify({ orderCode, amount }));
     } else {
       const saved = localStorage.getItem('thankYouOrder');
       if (saved) {
