@@ -199,7 +199,6 @@ function BTN() {
   // --- RENDER FUNCTIONS FOR FORMS ---
   const renderLoginForm = () => (
     <form className="space-y-3" onSubmit={handleAuthSubmit}>
-      {formErrors.login && <div className="text-red-500 text-sm mb-2 text-center">{formErrors.login}</div>}
       <input
         type="email"
         name="email"
@@ -218,6 +217,10 @@ function BTN() {
         className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]"
         required
       />
+      {/* Thông báo lỗi tiếng Việt ngay trên nút */}
+      {formErrors.login && (
+        <div className="text-red-500 text-sm mb-2 text-center">{formErrors.login === "Invalid email or password" ? "Email hoặc mật khẩu không đúng" : formErrors.login}</div>
+      )}
       <button type="submit" className="w-full bg-[#A47148] text-white py-2 rounded hover:bg-[#D9A074] transition font-semibold" disabled={loading}>
         {loading ? 'Đang xử lý...' : 'Đăng nhập'}
       </button>
@@ -231,10 +234,6 @@ function BTN() {
 
   const renderRegisterForm = () => (
     <form className="space-y-3" onSubmit={handleAuthSubmit}>
-      {registerSuccess && (
-        <div className="text-green-600 text-sm mb-2 text-center font-semibold">Đăng ký thành công!</div>
-      )}
-      {formErrors.general && <div className="text-red-500 text-sm mb-2 text-center">{formErrors.general}</div>}
       <input
         type="text"
         name="username"
@@ -276,6 +275,13 @@ function BTN() {
         minLength="6"
       />
       {formErrors.password && <div className="text-red-500 text-xs">{formErrors.password}</div>}
+      {/* Thông báo lỗi tiếng Việt ngay trên nút */}
+      {formErrors.general && (
+        <div className="text-red-500 text-sm mb-2 text-center">{formErrors.general}</div>
+      )}
+      {registerSuccess && (
+        <div className="text-green-600 text-sm mb-2 text-center font-semibold">Đăng ký thành công!</div>
+      )}
       <button
         type="submit"
         className="w-full bg-[#A47148] text-white py-2 rounded hover:bg-[#D9A074] transition font-semibold"
