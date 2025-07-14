@@ -32,7 +32,7 @@ function Checkout() {
       fetchCart().then(latestCart => {
         if (latestCart && latestCart.length === 0) {
             message.info("Giỏ hàng của bạn đang trống.");
-            navigate('/gio-hang', { replace: true });
+            navigate('/checkout/thank-you', { replace: true });
         }
       });
     }
