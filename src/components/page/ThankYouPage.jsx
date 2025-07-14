@@ -16,52 +16,35 @@ function ThankYouPage() {
   });
 
   useEffect(() => {
-    if (isProcessing.current) return;
-    isProcessing.current = true;
+    let foundOrder = false;
+    let code, amt;
 
-    // Lấy thông tin đơn hàng từ location.state hoặc localStorage
-    let stateOrder = location.state;
-    let orderCode = '';
-    let amount = 0;
-    if (stateOrder && stateOrder.orderCode && stateOrder.amount) {
-      orderCode = stateOrder.orderCode;
-      amount = stateOrder.amount;
-      localStorage.setItem('thankYouOrder', JSON.stringify({ orderCode, amount }));
+    if (location.state?.orderCode && location.state?.amount) {
+      code = location.state.orderCode;
+      amt = location.state.amount;
+      localStorage.setItem('thankYouOrder', JSON.stringify({ orderCode: code, amount: amt }));
+      foundOrder = true;
     } else {
       const saved = localStorage.getItem('thankYouOrder');
       if (saved) {
         try {
           const parsed = JSON.parse(saved);
-          orderCode = parsed.orderCode;
-          amount = parsed.amount;
-        } catch (e) {}
+          code = parsed.orderCode;
+          amt = parsed.amount;
+          foundOrder = true;
+        } catch {}
       }
     }
 
-    if (!orderCode || !amount) {
-      setPageStatus({
-        isLoading: false,
-        isSuccess: false,
-        message: 'Không tìm thấy thông tin đơn hàng. Vui lòng đặt lại đơn hàng.'
-      });
-      setTimeout(() => navigate('/gio-hang', { replace: true }), 2000);
-      return;
+    if (foundOrder) {
+      setOrderDetails({ orderCode: code, amount: amt });
+      setPageStatus({ isLoading: false, isSuccess: true, message: 'Đặt hàng thành công!' });
+    } else {
+      setPageStatus({ isLoading: false, isSuccess: false, message: 'Không tìm thấy thông tin đơn hàng.' });
+      setTimeout(() => navigate('/gio-hang', { replace: true }), 3000);
     }
+  }, [location.state, navigate]);
 
-    setOrderDetails({ orderCode, amount });
-    setPageStatus({
-      isLoading: false,
-      isSuccess: true,
-      message: 'Đặt hàng thành công!'
-    });
-    // Cập nhật lại giỏ hàng và thông báo
-    fetchCart && fetchCart();
-    fetchNotifications && fetchNotifications();
-    // Xóa localStorage sau khi hiển thị
-    setTimeout(() => {
-      localStorage.removeItem('thankYouOrder');
-    }, 3000);
-  }, [location.state, navigate, fetchCart, fetchNotifications]);
 
   if (pageStatus.isLoading) {
     return (
