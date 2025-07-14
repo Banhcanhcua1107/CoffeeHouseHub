@@ -4,9 +4,12 @@ import { motion } from 'framer-motion';
 import { FaSearch, FaUserShield, FaUser, FaChevronLeft, FaChevronRight, FaEdit } from 'react-icons/fa';
 import AdminSidebar from '@/components/Admin/AdminSidebar';
 import { ShopContext } from '@/components/context/ShopContext';
+import { useNavigate } from 'react-router-dom';
+import { message } from 'antd';
 
 const UserManagementPage = () => {
-  const { user, token } = useContext(ShopContext);
+  const { user, token, updateUser } = useContext(ShopContext);
+  const navigate = useNavigate();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -28,6 +31,11 @@ const UserManagementPage = () => {
     } catch (err) {
       console.error("Lỗi khi lấy danh sách người dùng:", err, err.response?.data);
       setError("Không thể tải danh sách người dùng. Vui lòng thử lại.");
+      if (err.response?.status === 401 || err.response?.status === 403) {
+        updateUser(null);
+        message.error('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        navigate('/dang-nhap');
+      }
     } finally {
       setLoading(false);
     }
@@ -96,6 +104,22 @@ const UserManagementPage = () => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
     setCurrentPage(pageNumber);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      message.error('Vui lòng đăng nhập để xem đơn hàng.');
+      navigate('/dang-nhap');
+      return;
+    }
+    if (!user) {
+      message.error('Vui lòng đăng nhập để xem đơn hàng.');
+      navigate('/dang-nhap');
+      return;
+    }
+    setLoading(true);
+    fetchUsers();
+  }, [user, navigate]);
 
   return (
     <div className="bg-gray-50 min-h-screen">
