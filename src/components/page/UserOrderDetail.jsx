@@ -13,7 +13,7 @@ const UserOrderDetail = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, isAuthLoading } = useContext(ShopContext);
-  
+
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
@@ -96,11 +96,9 @@ const UserOrderDetail = () => {
   // ----- CÁC HÀM XỬ LÝ CHO USER -----
   const canUserCancel = useMemo(() => {
     if (!order) return false;
-    if (order.user_id !== userId) return false;
     const timeDiffMinutes = (new Date() - new Date(order.order_date)) / (1000 * 60);
     return order.order_status === 'processing' && timeDiffMinutes < 10;
-  }, [order, userId]);
-
+  }, [order]);
 
   const handleUserCancelOrder = () => {
     Modal.confirm({
