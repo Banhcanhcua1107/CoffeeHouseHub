@@ -26,7 +26,7 @@ const UserManagementPage = () => {
       });
       setUsers(response.data);
     } catch (err) {
-      console.error("Lỗi khi lấy danh sách người dùng:", err);
+      console.error("Lỗi khi lấy danh sách người dùng:", err, err.response?.data);
       setError("Không thể tải danh sách người dùng. Vui lòng thử lại.");
     } finally {
       setLoading(false);
@@ -36,6 +36,8 @@ const UserManagementPage = () => {
   useEffect(() => {
     if (token) {
       fetchUsers();
+    } else {
+      console.log("Chưa có token, không thể lấy danh sách user");
     }
   }, [token]);
 
