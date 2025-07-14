@@ -841,6 +841,21 @@ app.get('/api/admin/users', authenticateJWT, adminOnly, async (req, res) => {
     }
 });
 
+app.put('/api/admin/users/:id', authenticateJWT, adminOnly, async (req, res) => {
+    const { fullname, email } = req.body;
+    const { id } = req.params;
+
+    try {
+        await dbPool.query(
+            "UPDATE users SET fullname = ?, email = ? WHERE id = ?",
+            [fullname, email, id]
+        );
+        res.json({ success: true, message: 'Cập nhật thông tin user thành công.' });
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
 // Thêm vào file server.js
 
 app.put('/api/admin/users/:id/role', authenticateJWT, adminOnly, async (req, res) => {
