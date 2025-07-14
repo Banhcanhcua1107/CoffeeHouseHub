@@ -102,29 +102,35 @@ const UserOrderDetail = () => {
 
   const handleUserCancelOrder = () => {
     Modal.confirm({
-      title: 'Bạn có chắc muốn hủy đơn hàng này?',
-      icon: <ExclamationCircleOutlined />,
-      content: 'Hành động này không thể hoàn tác.',
-      okText: 'Xác nhận hủy',
-      okType: 'danger', cancelText: 'Không',
-      onOk: async () => {
-        setIsUpdating(true);
-        try {
-          const token = localStorage.getItem('token');
-          const res = await fetch(`https://coffeehousehub-production.up.railway.app/orders/user-cancel/${order.id}`, {
-            method: 'PUT',
-            headers: { 'Authorization': `Bearer ${token}` },
-          });
-          const data = await res.json();
-          if (!res.ok) throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
-          message.success('Đã hủy đơn hàng thành công!');
-          await fetchOrder(); // Tải lại để cập nhật
-        } catch (error) {
-          message.error(error.message);
-        } finally {
-          setIsUpdating(false);
+        title: 'Bạn có chắc muốn hủy đơn hàng này?',
+        icon: <ExclamationCircleOutlined />,
+        content: order.payment_status === 'paid' ? 
+            'Đơn hàng này đã được thanh toán. Số tiền sẽ được hoàn trả trong 3-5 ngày làm việc.' :
+            'Hành động này không thể hoàn tác.',
+        okText: 'Xác nhận hủy',
+        okType: 'danger',
+        cancelText: 'Không',
+        onOk: async () => {
+            setIsUpdating(true);
+            try {
+                const token = localStorage.getItem('token');
+                const res = await fetch(`https://coffeehousehub-production.up.railway.app/orders/user-cancel/${order.id}`, {
+                    method: 'PUT',
+                    headers: { 
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
+                message.success('Đã hủy đơn hàng thành công!');
+                await fetchOrder();
+            } catch (error) {
+                message.error(error.message);
+            } finally {
+                setIsUpdating(false);
+            }
         }
-      },
     });
   };
 

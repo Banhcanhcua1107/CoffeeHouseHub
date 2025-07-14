@@ -355,37 +355,49 @@ app.put('/orders/user-cancel/:orderId', authenticateJWT, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        // Lấy thông tin đơn hàng để kiểm tra
-        const [[order]] = await dbPool.query('SELECT user_id, order_status, order_date FROM orders WHERE id = ?', [orderId]);
+        // Lấy thông tin đơn hàng
+        const [[order]] = await dbPool.query(
+            'SELECT * FROM orders WHERE id = ? AND user_id = ?', 
+            [orderId, userId]
+        );
 
         if (!order) {
             return res.status(404).json({ error: 'Không tìm thấy đơn hàng.' });
         }
 
-        // Kiểm tra quyền: Phải là chủ đơn hàng
-        if (order.user_id !== userId) {
-            return res.status(403).json({ error: 'Bạn không có quyền hủy đơn hàng này.' });
-        }
-
-        // Kiểm tra trạng thái: Chỉ được hủy khi đang 'processing'
+        // Kiểm tra trạng thái đơn hàng
         if (order.order_status !== 'processing') {
-            return res.status(400).json({ error: `Không thể hủy đơn hàng ở trạng thái "${order.order_status}".` });
+            return res.status(400).json({ 
+                error: `Không thể hủy đơn hàng ở trạng thái "${order.order_status}".` 
+            });
         }
 
-        // Kiểm tra thời gian: Chỉ được hủy trong 10 phút
+        // Kiểm tra thời gian
         const timeDiffMinutes = (new Date() - new Date(order.order_date)) / (1000 * 60);
         if (timeDiffMinutes > 10) {
-            return res.status(400).json({ error: 'Đã quá thời gian cho phép hủy đơn (10 phút).' });
+            return res.status(400).json({ 
+                error: 'Đã quá thời gian cho phép hủy đơn (10 phút).' 
+            });
         }
 
-        // Nếu tất cả điều kiện đều ổn, tiến hành hủy
-        const cancellation_reason = 'Người dùng tự hủy.';
+        // Tiến hành hủy đơn
         await dbPool.query(
             'UPDATE orders SET order_status = "cancelled", cancellation_reason = ? WHERE id = ?',
-            [cancellation_reason, orderId]
+            ['Người dùng tự hủy đơn.', orderId]
         );
 
-        res.json({ success: true, message: 'Đã hủy đơn hàng thành công.' });
+        // Tạo thông báo
+        await createNotification(
+            userId,
+            `Đơn hàng #${order.order_code} đã được hủy theo yêu cầu của bạn.`,
+            `/don-hang/${order.order_code}`
+        );
+
+        res.json({ 
+            success: true, 
+            message: 'Đã hủy đơn hàng thành công.' 
+        });
+
     } catch (error) {
         console.error("Lỗi khi user hủy đơn hàng:", error);
         res.status(500).json({ error: 'Lỗi hệ thống.' });
@@ -1273,7 +1285,7 @@ app.post("/request-password-reset", async (req, res) => {
                     <p style="font-size: 16px; color: #555; margin-bottom: 20px;">
                     Mã xác nhận đặt lại mật khẩu của bạn là:
                     </p>
-                    <div style="font-size: 32px; font-weight: bold; letter-spacing: 10px; margin: 25px 0; background: #f9f5f0; color: #A47148; padding: 18px; border-radius: 10px; text-align: center;">
+                    <div style="font-size: 32px; font-weight: bold, letter-spacing: 10px; margin: 25px 0; background: #f9f5f0; color: #A47148; padding: 18px; border-radius: 10px; text-align: center;">
                     ${resetCode}
                     </div>
                     <p style="color: #888; font-size: 15px;">Mã này có hiệu lực trong 5 phút.</p>
@@ -1310,6 +1322,7 @@ app.post("/verify-reset-code", async (req, res) => {
         const sql = 'SELECT id FROM users WHERE email = ? AND reset_code = ? AND reset_code_expires > NOW()';
         const [results] = await dbPool.query(sql, [email, code]);
         if (results.length === 0) return res.status(400).json({ error: 'Invalid or expired reset code' });
+
         res.json({ message: 'Reset code is valid' });
     } catch (err) {
         res.status(500).json({ error: err.message });
