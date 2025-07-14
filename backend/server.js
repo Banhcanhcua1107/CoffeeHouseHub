@@ -842,19 +842,42 @@ app.get('/api/admin/users', authenticateJWT, adminOnly, async (req, res) => {
 });
 
 app.put('/api/admin/users/:id', authenticateJWT, adminOnly, async (req, res) => {
-    const { fullname, email } = req.body;
     const { id } = req.params;
+    const { fullname, email, password } = req.body;
 
     try {
-        await dbPool.query(
-            "UPDATE users SET fullname = ?, email = ? WHERE id = ?",
-            [fullname, email, id]
-        );
-        res.json({ success: true, message: 'Cập nhật thông tin user thành công.' });
+        let sql = 'UPDATE users SET ';
+        const values = [];
+
+        if (fullname) {
+            sql += 'fullname = ?, ';
+            values.push(fullname);
+        }
+        if (email) {
+            sql += 'email = ?, ';
+            values.push(email);
+        }
+        if (password) {
+            const hashed = await bcrypt.hash(password, saltRounds);
+            sql += 'password = ?, ';
+            values.push(hashed);
+        }
+
+        if (values.length === 0) {
+            return res.status(400).json({ error: "Không có trường nào để cập nhật." });
+        }
+
+        sql = sql.slice(0, -2) + ' WHERE id = ?';
+        values.push(id);
+
+        await dbPool.query(sql, values);
+        res.json({ success: true, message: "Đã cập nhật thông tin user." });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        console.error("Lỗi khi cập nhật user:", err);
+        res.status(500).json({ error: 'Lỗi hệ thống.' });
     }
 });
+
 
 // Thêm vào file server.js
 
