@@ -45,6 +45,8 @@ function BTN() {
   const navigate = useNavigate();
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
+  const [formErrors, setFormErrors] = useState({});
+  const [registerSuccess, setRegisterSuccess] = useState(false);
 
   const notificationRef = useRef(null);
   const authRef = useRef(null);
@@ -106,19 +108,56 @@ function BTN() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // --- VALIDATION FOR REGISTER ---
+  const validateRegister = () => {
+    const errors = {};
+    if (!formData.username.trim()) errors.username = "Vui lòng nhập tên đăng nhập";
+    if (!formData.fullname.trim()) errors.fullname = "Vui lòng nhập họ và tên";
+    if (!formData.email.trim()) errors.email = "Vui lòng nhập email";
+    else if (!/^[\w-.]+@gmail\.com$/.test(formData.email.trim())) errors.email = "Email phải là địa chỉ @gmail.com hợp lệ";
+    if (!formData.password) errors.password = "Vui lòng nhập mật khẩu";
+    else if (formData.password.length < 6) errors.password = "Mật khẩu phải có ít nhất 6 ký tự";
+    else if (!/[A-Z]/.test(formData.password)) errors.password = "Mật khẩu phải có ít nhất 1 ký tự viết hoa";
+    else if (!/[^A-Za-z0-9]/.test(formData.password)) errors.password = "Mật khẩu phải có ít nhất 1 ký tự đặc biệt";
+    return errors;
+  };
+
   const handleAuthSubmit = (e) => {
     e.preventDefault();
+    setFormErrors({});
+    setRegisterSuccess(false);
+
+    if (showForm === 'register') {
+      const errors = validateRegister();
+      if (Object.keys(errors).length > 0) {
+        setFormErrors(errors);
+        return;
+      }
+    }
+
     const endpoint = showForm === 'login' ? '/login' : '/register';
-    const data = showForm === 'login' 
+    const data = showForm === 'login'
       ? { email: formData.email, password: formData.password }
       : { username: formData.username, fullname: formData.fullname, email: formData.email, password: formData.password };
-    
+
     apiCall('post', `${API_BASE_URL}${endpoint}`, data, setLoading, (responseData) => {
+      if (showForm === 'register') {
+        setRegisterSuccess(true);
+        setFormData({ username: '', email: '', password: '', fullname: '', resetCode: '', newPassword: '', confirmPassword: '' });
+        return;
+      }
       message.success(responseData.message);
       localStorage.setItem('token', responseData.token);
       updateUser(responseData.user);
       setShowForm(null);
       navigate('/');
+    }, (error) => {
+      if (showForm === 'register') {
+        setFormErrors({ general: error.response?.data?.error || "Đăng ký thất bại" });
+      }
+      if (showForm === 'login') {
+        setFormErrors({ login: error.response?.data?.error || "Email hoặc mật khẩu sai" });
+      }
     });
   };
   
@@ -160,20 +199,90 @@ function BTN() {
   // --- RENDER FUNCTIONS FOR FORMS ---
   const renderLoginForm = () => (
     <form className="space-y-3" onSubmit={handleAuthSubmit}>
-      <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]" required />
-      <input type="password" name="password" placeholder="Mật khẩu" value={formData.password} onChange={handleChange} className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]" required />
-      <button type="submit" className="w-full bg-[#A47148] text-white py-2 rounded hover:bg-[#D9A074] transition font-semibold" disabled={loading}>{loading ? 'Đang xử lý...' : 'Đăng nhập'}</button>
-      <div className="text-center"><button type="button" className="text-[#A47148] hover:underline text-sm" onClick={() => toggleForm('reset')}>Quên mật khẩu?</button></div>
+      {formErrors.login && <div className="text-red-500 text-sm mb-2 text-center">{formErrors.login}</div>}
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={handleChange}
+        className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]"
+        required
+      />
+      <input
+        type="password"
+        name="password"
+        placeholder="Mật khẩu"
+        value={formData.password}
+        onChange={handleChange}
+        className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]"
+        required
+      />
+      <button type="submit" className="w-full bg-[#A47148] text-white py-2 rounded hover:bg-[#D9A074] transition font-semibold" disabled={loading}>
+        {loading ? 'Đang xử lý...' : 'Đăng nhập'}
+      </button>
+      <div className="text-center">
+        <button type="button" className="text-[#A47148] hover:underline text-sm" onClick={() => toggleForm('reset')}>
+          Quên mật khẩu?
+        </button>
+      </div>
     </form>
   );
 
   const renderRegisterForm = () => (
     <form className="space-y-3" onSubmit={handleAuthSubmit}>
-      <input type="text" name="username" placeholder="Tên đăng nhập" value={formData.username} onChange={handleChange} className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]" required />
-      <input type="text" name="fullname" placeholder="Họ và tên" value={formData.fullname} onChange={handleChange} className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]" required />
-      <input type="email" name="email" placeholder="Email" value={formData.email} onChange={handleChange} className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]" required />
-      <input type="password" name="password" placeholder="Mật khẩu" value={formData.password} onChange={handleChange} className="w-full p-2 bg-[#FFF7ED] border border-[#D9A074] rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074]" required minLength="6" />
-      <button type="submit" className="w-full bg-[#A47148] text-white py-2 rounded hover:bg-[#D9A074] transition font-semibold" disabled={loading}>{loading ? 'Đang xử lý...' : 'Tạo tài khoản'}</button>
+      {registerSuccess && (
+        <div className="text-green-600 text-sm mb-2 text-center font-semibold">Đăng ký thành công!</div>
+      )}
+      {formErrors.general && <div className="text-red-500 text-sm mb-2 text-center">{formErrors.general}</div>}
+      <input
+        type="text"
+        name="username"
+        placeholder="Tên đăng nhập"
+        value={formData.username}
+        onChange={handleChange}
+        className={`w-full p-2 bg-[#FFF7ED] border rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074] ${formErrors.username ? 'border-red-500' : 'border-[#D9A074]'}`}
+        required
+      />
+      {formErrors.username && <div className="text-red-500 text-xs">{formErrors.username}</div>}
+      <input
+        type="text"
+        name="fullname"
+        placeholder="Họ và tên"
+        value={formData.fullname}
+        onChange={handleChange}
+        className={`w-full p-2 bg-[#FFF7ED] border rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074] ${formErrors.fullname ? 'border-red-500' : 'border-[#D9A074]'}`}
+        required
+      />
+      {formErrors.fullname && <div className="text-red-500 text-xs">{formErrors.fullname}</div>}
+      <input
+        type="email"
+        name="email"
+        placeholder="Email"
+        value={formData.email}
+        onChange={handleChange}
+        className={`w-full p-2 bg-[#FFF7ED] border rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074] ${formErrors.email ? 'border-red-500' : 'border-[#D9A074]'}`}
+        required
+      />
+      {formErrors.email && <div className="text-red-500 text-xs">{formErrors.email}</div>}
+      <input
+        type="password"
+        name="password"
+        placeholder="Mật khẩu"
+        value={formData.password}
+        onChange={handleChange}
+        className={`w-full p-2 bg-[#FFF7ED] border rounded focus:outline-none focus:ring-1 focus:ring-[#D9A074] ${formErrors.password ? 'border-red-500' : 'border-[#D9A074]'}`}
+        required
+        minLength="6"
+      />
+      {formErrors.password && <div className="text-red-500 text-xs">{formErrors.password}</div>}
+      <button
+        type="submit"
+        className="w-full bg-[#A47148] text-white py-2 rounded hover:bg-[#D9A074] transition font-semibold"
+        disabled={loading}
+      >
+        {loading ? 'Đang xử lý...' : 'Tạo tài khoản'}
+      </button>
     </form>
   );
 
