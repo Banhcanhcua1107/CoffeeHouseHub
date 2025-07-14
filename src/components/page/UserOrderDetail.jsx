@@ -97,10 +97,18 @@ const UserOrderDetail = () => {
   const canUserCancel = useMemo(() => {
     if (!order) return false;
     const timeDiffMinutes = (new Date() - new Date(order.order_date)) / (1000 * 60);
-    return order.order_status === 'processing' && timeDiffMinutes < 10;
+    // Thêm điều kiện để kiểm tra trạng thái
+    return order.order_status === 'processing' && 
+           timeDiffMinutes < 10 && 
+           !['shipped', 'delivered', 'cancelled'].includes(order.order_status);
   }, [order]);
 
   const handleUserCancelOrder = () => {
+    if (!canUserCancel) {
+        message.error('Không thể hủy đơn hàng này.');
+        return;
+    }
+
     Modal.confirm({
         title: 'Bạn có chắc muốn hủy đơn hàng này?',
         icon: <ExclamationCircleOutlined />,
@@ -119,7 +127,10 @@ const UserOrderDetail = () => {
                     headers: { 
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
-                    }
+                    },
+                    body: JSON.stringify({
+                        cancellation_reason: 'Người dùng tự hủy đơn'
+                    })
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
@@ -259,9 +270,15 @@ const UserOrderDetail = () => {
                 <Button onClick={() => navigate('/')}>Quay về trang chủ</Button>
               )}
 
-              {user.role !== 'admin' && canUserCancel && (
-                <Button type="primary" danger onClick={handleUserCancelOrder} loading={isUpdating}>
-                  Hủy đơn hàng
+              {user.role !== 'admin' && order.order_status === 'processing' && canUserCancel && (
+                <Button 
+                    type="primary" 
+                    danger 
+                    onClick={handleUserCancelOrder} 
+                    loading={isUpdating}
+                    disabled={isUpdating}
+                >
+                    Hủy đơn hàng
                 </Button>
               )}
             </div>
