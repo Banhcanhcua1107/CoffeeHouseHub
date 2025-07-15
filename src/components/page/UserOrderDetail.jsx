@@ -19,8 +19,9 @@ const UserOrderDetail = () => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission control
 
-  // State cho modal hủy của admin
+  // State cho modal hủy của admin và user
   const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
+  const [isUserCancelModalVisible, setIsUserCancelModalVisible] = useState(false);
   const [cancellationReason, setCancellationReason] = useState('');
 
   const fetchOrder = async () => {
@@ -113,46 +114,50 @@ const UserOrderDetail = () => {
       return;
     }
 
-    Modal.confirm({
-      title: 'Bạn có chắc muốn hủy đơn hàng này?',
-      icon: <ExclamationCircleOutlined />,
-      content: 'Hành động này không thể hoàn tác.',
-      okText: 'Xác nhận hủy',
-      okType: 'danger',
-      cancelText: 'Không',
-      okButtonProps: { disabled: isSubmitting },
-      onOk: async () => {
-        setIsSubmitting(true);
-        setIsUpdating(true);
-        try {
-          const token = localStorage.getItem('token');
-          const apiUrl = `https://coffeehousehub-production.up.railway.app/orders/user-cancel/${order.id}`;
+    // Hiển thị modal cho người dùng nhập lý do hủy
+    setIsUserCancelModalVisible(true);
+  };
 
-          const res = await fetch(apiUrl, {
-            method: 'PUT',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'application/json'
-            },
-          });
+  const handleUserCancelConfirm = async () => {
+    if (!cancellationReason.trim()) {
+      message.error('Vui lòng nhập lý do hủy đơn.');
+      return;
+    }
 
-          const data = await res.json();
-          if (!res.ok) {
-            console.error("API trả về lỗi:", data);
-            throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
-          }
+    setIsSubmitting(true);
+    setIsUpdating(true);
+    try {
+      const token = localStorage.getItem('token');
+      const apiUrl = `https://coffeehousehub-production.up.railway.app/orders/user-cancel/${order.id}`;
 
-          message.success('Đã hủy đơn hàng thành công!');
-          await fetchOrder();
-        } catch (error) {
-          console.error("Lỗi trong khối catch:", error);
-          message.error(error.message);
-        } finally {
-          setIsSubmitting(false);
-          setIsUpdating(false);
-        }
-      },
-    });
+      const res = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          cancellation_reason: cancellationReason
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        console.error("API trả về lỗi:", data);
+        throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
+      }
+
+      message.success('Đã hủy đơn hàng thành công!');
+      setIsUserCancelModalVisible(false);
+      setCancellationReason('');
+      await fetchOrder();
+    } catch (error) {
+      console.error("Lỗi trong khối catch:", error);
+      message.error(error.message);
+    } finally {
+      setIsSubmitting(false);
+      setIsUpdating(false);
+    }
   };
 
   // Các hàm helper
@@ -312,6 +317,29 @@ const UserOrderDetail = () => {
           value={cancellationReason}
           onChange={(e) => setCancellationReason(e.target.value)}
           placeholder="Ví dụ: Hết hàng, sai thông tin khách hàng,..."
+        />
+      </Modal>
+
+      {/* Modal cho người dùng hủy đơn hàng */}
+      <Modal
+        title={`Hủy đơn hàng #${order?.order_code}`}
+        visible={isUserCancelModalVisible}
+        onOk={handleUserCancelConfirm}
+        onCancel={() => {
+          setIsUserCancelModalVisible(false);
+          setCancellationReason('');
+        }}
+        confirmLoading={isSubmitting}
+        okText="Xác nhận hủy"
+        cancelText="Không"
+        okButtonProps={{ danger: true }}
+      >
+        <p className="mb-2">Vui lòng cho chúng tôi biết lý do bạn muốn hủy đơn hàng:</p>
+        <TextArea
+          rows={4}
+          value={cancellationReason}
+          onChange={(e) => setCancellationReason(e.target.value)}
+          placeholder="Nhập lý do hủy đơn hàng..."
         />
       </Modal>
     </div>
