@@ -6,7 +6,7 @@ import AdminSidebar from '@/components/Admin/AdminSidebar';
 import { ShopContext } from '@/components/context/ShopContext';
 
 const UserManagementPage = () => {
-  const { user, token } = useContext(ShopContext);
+  const { user } = useContext(ShopContext);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -21,8 +21,12 @@ const UserManagementPage = () => {
     setLoading(true);
     setError(null);
     try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Vui lòng đăng nhập lại');
+      }
       console.log('Fetching users with token:', token);
-      const response = await axios.get('/api/admin/users', {
+      const response = await axios.get('https://coffeehousehub-production.up.railway.app/api/admin/users', {
         headers: { 
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -32,21 +36,23 @@ const UserManagementPage = () => {
       setUsers(response.data);
     } catch (err) {
       console.error("Error details:", err.response || err);
-      setError(err.response?.data?.message || "Không thể tải danh sách người dùng. Vui lòng thử lại.");
+      setError(err.response?.data?.message || err.message || "Không thể tải danh sách người dùng. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    if (token) {
-      console.log('Token available, fetching users...');
-      fetchUsers();
-    } else {
-      console.log('No token available');
-      setError("Vui lòng đăng nhập lại để truy cập trang này");
+    if (!user) {
+      setError("Vui lòng đăng nhập để truy cập trang này");
+      return;
     }
-  }, [token]);
+    if (user.role !== 'admin') {
+      setError("Bạn không có quyền truy cập trang này");
+      return;
+    }
+    fetchUsers();
+  }, [user]);
 
   const filteredUsers = useMemo(() => {
     return users.filter(u =>
