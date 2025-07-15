@@ -843,13 +843,18 @@ app.get("/admin/users", authenticateJWT, adminOnly, async (req, res) => {
 
 app.get('/api/admin/users', authenticateJWT, adminOnly, async (req, res) => {
     try {
-        // Lấy tất cả các cột cần thiết, TRỪ cột password, sắp xếp theo ID để user mới nhất lên đầu
-        const sql = 'SELECT id, username, email, fullname, role FROM users ORDER BY id DESC';
-        const [results] = await dbPool.query(sql);
-        res.json(results);
+        console.log('Fetching users list - Admin request from:', req.user.id);
+        const [users] = await dbPool.query(
+            'SELECT id, username, email, fullname, role, created_at FROM users ORDER BY created_at DESC'
+        );
+        console.log(`Found ${users.length} users`);
+        res.json(users);
     } catch (err) {
-        console.error("Lỗi khi lấy danh sách người dùng:", err);
-        res.status(500).json({ error: 'Lỗi hệ thống.' });
+        console.error('Error in /api/admin/users:', err);
+        res.status(500).json({
+            message: 'Lỗi khi lấy danh sách người dùng',
+            error: err.message
+        });
     }
 });
 

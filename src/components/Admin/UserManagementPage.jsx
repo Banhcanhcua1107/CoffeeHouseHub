@@ -21,13 +21,18 @@ const UserManagementPage = () => {
     setLoading(true);
     setError(null);
     try {
+      console.log('Fetching users with token:', token);
       const response = await axios.get('/api/admin/users', {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
+      console.log('Users data received:', response.data);
       setUsers(response.data);
     } catch (err) {
-      console.error("Lỗi khi lấy danh sách người dùng:", err);
-      setError("Không thể tải danh sách người dùng. Vui lòng thử lại.");
+      console.error("Error details:", err.response || err);
+      setError(err.response?.data?.message || "Không thể tải danh sách người dùng. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -35,7 +40,11 @@ const UserManagementPage = () => {
 
   useEffect(() => {
     if (token) {
+      console.log('Token available, fetching users...');
       fetchUsers();
+    } else {
+      console.log('No token available');
+      setError("Vui lòng đăng nhập lại để truy cập trang này");
     }
   }, [token]);
 
