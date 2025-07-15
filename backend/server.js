@@ -355,54 +355,43 @@ app.put('/orders/user-cancel/:orderId', authenticateJWT, async (req, res) => {
     const userId = req.user.id;
 
     try {
-        // Lấy thông tin đơn hàng
-        const [[order]] = await dbPool.query(
-            'SELECT * FROM orders WHERE id = ? AND user_id = ?', 
-            [orderId, userId]
-        );
+        // Lấy thông tin đơn hàng để kiểm tra
+        const [[order]] = await dbPool.query('SELECT user_id, order_status, order_date FROM orders WHERE id = ?', [orderId]);
 
         if (!order) {
             return res.status(404).json({ error: 'Không tìm thấy đơn hàng.' });
         }
 
-        // Kiểm tra trạng thái đơn hàng
-        if (order.order_status !== 'processing') {
-            return res.status(400).json({ 
-                error: `Không thể hủy đơn hàng ở trạng thái "${order.order_status}".` 
-            });
+        // Kiểm tra quyền: Phải là chủ đơn hàng
+        if (order.user_id !== userId) {
+            return res.status(403).json({ error: 'Bạn không có quyền hủy đơn hàng này.' });
         }
 
-        // Kiểm tra thời gian
+        // Kiểm tra trạng thái: Chỉ được hủy khi đang 'processing'
+        if (order.order_status !== 'processing') {
+            return res.status(400).json({ error: `Không thể hủy đơn hàng ở trạng thái "${order.order_status}".` });
+        }
+
+        // Kiểm tra thời gian: Chỉ được hủy trong 10 phút
         const timeDiffMinutes = (new Date() - new Date(order.order_date)) / (1000 * 60);
         if (timeDiffMinutes > 10) {
-            return res.status(400).json({ 
-                error: 'Đã quá thời gian cho phép hủy đơn (10 phút).' 
-            });
+            return res.status(400).json({ error: 'Đã quá thời gian cho phép hủy đơn (10 phút).' });
         }
 
-        // Tiến hành hủy đơn
+        // Nếu tất cả điều kiện đều ổn, tiến hành hủy
+        const cancellation_reason = 'Người dùng tự hủy.';
         await dbPool.query(
             'UPDATE orders SET order_status = "cancelled", cancellation_reason = ? WHERE id = ?',
-            ['Người dùng tự hủy đơn.', orderId]
+            [cancellation_reason, orderId]
         );
 
-        // Tạo thông báo
-        await createNotification(
-            userId,
-            `Đơn hàng #${order.order_code} đã được hủy theo yêu cầu của bạn.`,
-            `/don-hang/${order.order_code}`
-        );
-
-        res.json({ 
-            success: true, 
-            message: 'Đã hủy đơn hàng thành công.' 
-        });
-
+        res.json({ success: true, message: 'Đã hủy đơn hàng thành công.' });
     } catch (error) {
         console.error("Lỗi khi user hủy đơn hàng:", error);
         res.status(500).json({ error: 'Lỗi hệ thống.' });
     }
 });
+
 
 // Helper Functions
 const createNotification = async (userId, message, link = null) => {
