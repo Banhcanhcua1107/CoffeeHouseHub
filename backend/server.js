@@ -595,9 +595,20 @@ app.get('/order/:orderCode', authenticateJWT, async (req, res) => {
             WHERE oi.order_id = ?
         `, [order.id]);
 
-        // 5. Gộp lại và trả về kết quả
-        const result = { ...order, items };
-        console.log(`[200] Đã trả về chi tiết đơn hàng ${orderCode} cho user ${userId}`); // Thêm log
+        const timeDiffMinutes = (new Date() - new Date(order.order_date)) / (1000 * 60);
+
+        // Tạo một trường boolean để cho frontend biết có được phép hủy hay không
+        const can_be_cancelled_by_user =
+            order.order_status === 'processing' && timeDiffMinutes < 10;
+        // ===================================================================
+
+        // 5. Gộp lại và trả về kết quả (bao gồm cả trường mới)
+        const result = {
+            ...order,
+            items,
+            can_be_cancelled: can_be_cancelled_by_user // Thêm trường này vào response
+        };
+        console.log(`[200] Đã trả về chi tiết đơn hàng ${orderCode} cho user ${userId}`);
         res.json(result);
 
     } catch (err) {

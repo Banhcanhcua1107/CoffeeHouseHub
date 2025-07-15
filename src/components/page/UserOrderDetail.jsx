@@ -93,12 +93,12 @@ const UserOrderDetail = () => {
     setCancellationReason('');
   };
 
-  // ----- CÁC HÀM XỬ LÝ CHO USER -----
-  const canUserCancel = useMemo(() => {
-    if (!order) return false;
-    const timeDiffMinutes = (new Date() - new Date(order.order_date)) / (1000 * 60);
-    return order.order_status === 'processing' && timeDiffMinutes < 10;
-  }, [order]);
+  // // ----- CÁC HÀM XỬ LÝ CHO USER -----
+  // const canUserCancel = useMemo(() => {
+  //   if (!order) return false;
+  //   const timeDiffMinutes = (new Date() - new Date(order.order_date)) / (1000 * 60);
+  //   return order.order_status === 'processing' && timeDiffMinutes < 10;
+  // }, [order]);
 
   const handleUserCancelOrder = () => {
       Modal.confirm({
@@ -253,7 +253,7 @@ const UserOrderDetail = () => {
                 <Button onClick={() => navigate('/')}>Quay về trang chủ</Button>
               )}
 
-              {user.role !== 'admin' && canUserCancel && (
+              {user.role !== 'admin' && order.can_be_cancelled && (
                 <Button 
                     type="primary" 
                     danger 
