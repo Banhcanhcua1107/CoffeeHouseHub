@@ -3,7 +3,7 @@ import logo from "@/components/img/LOGOCOFFE/logoCoffee.png";
 
 function Footer() {
   const branch1Address = "736 Nguyễn Trãi, Phường 11, Quận 5, Tp.HCM";
-  const branch2Address = "28-30 Ngô Quyền, Phường 6, Quận 5, Tp.HCM";
+  const branch2Address = "37 Kinh Dương Vương, Phường 12, Quận 6, TP.HCM";
 
   const getGoogleMapsUrl = (address) => `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
 
@@ -16,7 +16,7 @@ function Footer() {
           <img
             src={logo}
             alt="Logo CoffeeHouse"
-            className="w-40 h-auto object-contain"
+            className="w-60 h-auto object-contain"
           />
         </div>
 
