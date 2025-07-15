@@ -845,8 +845,9 @@ app.get('/api/admin/users', authenticateJWT, adminOnly, async (req, res) => {
     try {
         console.log('Fetching users list - Admin request from:', req.user.id);
         const [users] = await dbPool.query(
-            'SELECT id, username, email, fullname, role FROM users ORDER BY id DESC'
+            'SELECT id, username, email, fullname, role FROM users WHERE role != "admin" ORDER BY id DESC'
         );
+
         console.log(`Found ${users.length} users`);
         res.json(users);
     } catch (err) {
