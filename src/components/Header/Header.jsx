@@ -16,7 +16,8 @@ function Header() {
 
   const locations = [
     { id: 1, name: "Chi Nhánh 1", address: "736 Nguyễn Trãi, P.11, Q.5, Tp.HCM" },
-    { id: 2, name: "Chi Nhánh 2", address: "28-30 Ngô Quyền, P.6, Q.5, Tp.HCM" }
+    { id: 2, name: "Chi Nhánh 2", address: "37 Kinh Dương Vương, Phường 12, Quận 6, TP.HCM" },
+    { id: 3, name: "Chi Nhánh 3", address: "Công viên Phần mềm Quang Trung, P. Tân Chánh Hiệp, Quận 12, TP.HCM" }
   ];
 
   const handleSelectLocation = (location) => {
@@ -83,10 +84,17 @@ function Header() {
             <div className="absolute top-full left-0 mt-4 w-72 bg-[#4B2E2E] rounded-lg shadow-xl z-50 p-4 border border-[#5A3A3A]" style={{ marginTop: '17px' }}>
               <h4 className="font-bold text-[#FFD8A9] mb-3 text-lg">Các chi nhánh</h4>
               {locations.map(location => (
-                <div key={location.id} className="mb-4 last:mb-0 p-3 rounded-lg cursor-pointer hover:text-[#FFD8A9] transition" onClick={() => handleSelectLocation(location)}>
-                  <p className="font-medium text-[#FFD8A9] text-base">{location.name}</p>
-                  <p className="text-sm text-gray-300 mt-1">{location.address}</p>
-                </div>
+                <div 
+                    key={location.id} 
+                    className="mb-4 last:mb-0 p-3 rounded-lg cursor-pointer 
+                              hover:bg-[#5A3A3A] hover:scale-105 transform transition-all duration-200
+                              hover:text-[#FFD8A9]"
+                    onClick={() => handleSelectLocation(location)}
+                  >
+                    <p className="font-medium text-[#FFD8A9] text-base">{location.name}</p>
+                    <p className="text-sm text-gray-300 mt-1">{location.address}</p>
+                  </div>
+
               ))}
             </div>
           )}
