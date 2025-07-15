@@ -101,32 +101,56 @@ const UserOrderDetail = () => {
   // }, [order]);
 
   const handleUserCancelOrder = () => {
-      Modal.confirm({
-        title: 'Bạn có chắc muốn hủy đơn hàng này?',
-        icon: <ExclamationCircleOutlined />,
-        content: 'Hành động này không thể hoàn tác.',
-        okText: 'Xác nhận hủy',
-        okType: 'danger', cancelText: 'Không',
-        onOk: async () => {
-          setIsUpdating(true);
-          try {
-            const token = localStorage.getItem('token');
-            const res = await fetch(`https://coffeehousehub-production.up.railway.app/orders/user-cancel/${order.id}`, {
-              method: 'PUT',
-              headers: { 'Authorization': `Bearer ${token}` },
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
-            message.success('Đã hủy đơn hàng thành công!');
-            await fetchOrder(); // Tải lại để cập nhật
-          } catch (error) {
-            message.error(error.message);
-          } finally {
-            setIsUpdating(false);
+    // ⭐ THÊM DÒNG NÀY VÀO ĐỂ DEBUG
+    console.log('Nút Hủy Đơn Hàng đã được bấm! Dữ liệu đơn hàng hiện tại:', order);
+    console.log('ID sẽ được gửi đi để hủy:', order?.id); // Sử dụng optional chaining để tránh lỗi nếu order null
+
+    // Nếu không có order hoặc order.id, dừng lại và thông báo
+    if (!order || !order.id) {
+        message.error('Lỗi: Không tìm thấy ID của đơn hàng để hủy.');
+        return; // Dừng hàm tại đây
+    }
+
+    Modal.confirm({
+      title: 'Bạn có chắc muốn hủy đơn hàng này?',
+      icon: <ExclamationCircleOutlined />,
+      content: 'Hành động này không thể hoàn tác.',
+      okText: 'Xác nhận hủy',
+      okType: 'danger', cancelText: 'Không',
+      onOk: async () => {
+        setIsUpdating(true);
+        try {
+          const token = localStorage.getItem('token');
+          // Kiểm tra lại URL gọi API
+          const apiUrl = `https://coffeehousehub-production.up.railway.app/orders/user-cancel/${order.id}`;
+          console.log("Đang gọi API hủy đơn:", apiUrl); // Log URL để chắc chắn
+
+          const res = await fetch(apiUrl, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+              // Mặc dù không có body, thêm header này cho rõ ràng
+              'Content-Type': 'application/json'
+            },
+          });
+
+          const data = await res.json();
+          if (!res.ok) {
+              console.error("API trả về lỗi:", data); // Log lỗi chi tiết từ server
+              throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
           }
-        },
-      });
-    };
+
+          message.success('Đã hủy đơn hàng thành công!');
+          await fetchOrder(); // Tải lại để cập nhật
+        } catch (error) {
+          console.error("Lỗi trong khối catch:", error); // Log lỗi chi tiết ra console
+          message.error(error.message);
+        } finally {
+          setIsUpdating(false);
+        }
+      },
+    });
+  };
 
   // Các hàm helper
   const getStatusTag = (status) => {
