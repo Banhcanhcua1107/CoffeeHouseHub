@@ -12,6 +12,7 @@ import "@/components/css/Parallax.css";
 const UserContactForm = () => {
   const [formState, setFormState] = useState({ name: "", email: "", message: "" });
   const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   const handleChange = (e) => {
     setFormState({ ...formState, [e.target.name]: e.target.value });
@@ -24,12 +25,15 @@ const UserContactForm = () => {
       const res = await axios.post("https://coffeehousehub-production.up.railway.app/contact/send", formState);
       if (res.data.success) {
         message.success(res.data.message);
+        setSuccessMsg(res.data.message); // thêm dòng này
         setFormState({ name: "", email: "", message: "" });
       } else {
         message.error(res.data.error || "Gửi liên hệ thất bại!");
+        setSuccessMsg("");
       }
     } catch (err) {
       message.error(err.response?.data?.error || "Có lỗi xảy ra. Vui lòng thử lại sau.");
+      setSuccessMsg("");
     }
     setLoading(false);
   };
@@ -59,6 +63,9 @@ const UserContactForm = () => {
               <input name="name" type="text" placeholder="Họ và tên của bạn" value={formState.name} onChange={handleChange} required className="w-full border border-gray-200 rounded px-4 py-3 bg-[#f7f3ee] focus:outline-none focus:ring-2 focus:ring-[#C0B09B]" />
               <input name="email" type="email" placeholder="Email liên hệ" value={formState.email} onChange={handleChange} required className="w-full border border-gray-200 rounded px-4 py-3 bg-[#f7f3ee] focus:outline-none focus:ring-2 focus:ring-[#C0B09B]" />
               <textarea name="message" rows={5} placeholder="Nội dung tin nhắn..." value={formState.message} onChange={handleChange} required className="w-full border border-gray-200 rounded px-4 py-3 bg-[#f7f3ee] focus:outline-none focus:ring-2 focus:ring-[#C0B09B]" />
+              {successMsg && (
+                <p className="text-green-600 font-semibold">{successMsg}</p>
+              )}
               <Button type="primary" htmlType="submit" loading={loading} style={{ backgroundColor: '#A47148', borderColor: '#A47148' }} size="large">
                 GỬI NGAY
               </Button>
