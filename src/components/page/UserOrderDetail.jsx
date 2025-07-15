@@ -97,16 +97,13 @@ const UserOrderDetail = () => {
   const canUserCancel = useMemo(() => {
     if (!order) return false;
     const timeDiffMinutes = (new Date() - new Date(order.order_date)) / (1000 * 60);
-    // Thêm điều kiện để kiểm tra trạng thái
-    return order.order_status === 'processing' && 
-           timeDiffMinutes < 10 && 
-           !['shipped', 'delivered', 'cancelled'].includes(order.order_status);
+    return order.order_status === 'processing' && timeDiffMinutes < 10;
   }, [order]);
 
   const handleUserCancelOrder = () => {
     if (!canUserCancel) {
-        message.error('Không thể hủy đơn hàng này.');
-        return;
+      message.error('Không thể hủy đơn hàng này.');
+      return;
     }
 
     Modal.confirm({
@@ -270,7 +267,7 @@ const UserOrderDetail = () => {
                 <Button onClick={() => navigate('/')}>Quay về trang chủ</Button>
               )}
 
-              {user.role !== 'admin' && order.order_status === 'processing' && canUserCancel && (
+              {user.role !== 'admin' && canUserCancel && (
                 <Button 
                     type="primary" 
                     danger 

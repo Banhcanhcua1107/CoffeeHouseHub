@@ -56,7 +56,7 @@ function ThankYouPage() {
         isSuccess: false,
         message: "Không tìm thấy thông tin đơn hàng. Vui lòng đặt lại."
       });
-      setTimeout(() => navigate('/cart', { replace: true }), 3000);
+      setTimeout(() => navigate('/checkout', { replace: true }), 3000);
     }
 
   }, [location.state, navigate, fetchCart, fetchNotifications]);
