@@ -17,6 +17,7 @@ const UserOrderDetail = () => {
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isUpdating, setIsUpdating] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false); // New state for submission control
 
   // State cho modal hủy của admin
   const [isCancelModalVisible, setIsCancelModalVisible] = useState(false);
@@ -101,14 +102,15 @@ const UserOrderDetail = () => {
   // }, [order]);
 
   const handleUserCancelOrder = () => {
-    // ⭐ THÊM DÒNG NÀY VÀO ĐỂ DEBUG
-    console.log('Nút Hủy Đơn Hàng đã được bấm! Dữ liệu đơn hàng hiện tại:', order);
-    console.log('ID sẽ được gửi đi để hủy:', order?.id); // Sử dụng optional chaining để tránh lỗi nếu order null
+    // Prevent multiple submissions
+    if (isSubmitting) {
+      return;
+    }
 
-    // Nếu không có order hoặc order.id, dừng lại và thông báo
+    // Validation checks
     if (!order || !order.id) {
-        message.error('Lỗi: Không tìm thấy ID của đơn hàng để hủy.');
-        return; // Dừng hàm tại đây
+      message.error('Lỗi: Không tìm thấy ID của đơn hàng để hủy.');
+      return;
     }
 
     Modal.confirm({
@@ -116,36 +118,37 @@ const UserOrderDetail = () => {
       icon: <ExclamationCircleOutlined />,
       content: 'Hành động này không thể hoàn tác.',
       okText: 'Xác nhận hủy',
-      okType: 'danger', cancelText: 'Không',
+      okType: 'danger',
+      cancelText: 'Không',
+      okButtonProps: { disabled: isSubmitting },
       onOk: async () => {
+        setIsSubmitting(true);
         setIsUpdating(true);
         try {
           const token = localStorage.getItem('token');
-          // Kiểm tra lại URL gọi API
           const apiUrl = `https://coffeehousehub-production.up.railway.app/orders/user-cancel/${order.id}`;
-          console.log("Đang gọi API hủy đơn:", apiUrl); // Log URL để chắc chắn
 
           const res = await fetch(apiUrl, {
             method: 'PUT',
             headers: {
               'Authorization': `Bearer ${token}`,
-              // Mặc dù không có body, thêm header này cho rõ ràng
               'Content-Type': 'application/json'
             },
           });
 
           const data = await res.json();
           if (!res.ok) {
-              console.error("API trả về lỗi:", data); // Log lỗi chi tiết từ server
-              throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
+            console.error("API trả về lỗi:", data);
+            throw new Error(data.error || 'Lỗi khi hủy đơn hàng');
           }
 
           message.success('Đã hủy đơn hàng thành công!');
-          await fetchOrder(); // Tải lại để cập nhật
+          await fetchOrder();
         } catch (error) {
-          console.error("Lỗi trong khối catch:", error); // Log lỗi chi tiết ra console
+          console.error("Lỗi trong khối catch:", error);
           message.error(error.message);
         } finally {
+          setIsSubmitting(false);
           setIsUpdating(false);
         }
       },
@@ -282,8 +285,8 @@ const UserOrderDetail = () => {
                     type="primary" 
                     danger 
                     onClick={handleUserCancelOrder} 
-                    loading={isUpdating}
-                    disabled={isUpdating}
+                    loading={isUpdating || isSubmitting}
+                    disabled={isUpdating || isSubmitting}
                 >
                     Hủy đơn hàng
                 </Button>
