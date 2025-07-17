@@ -56,6 +56,11 @@ function ProductDetail() {
   }, [products, product]); // Chạy lại khi có sản phẩm mới hoặc danh sách sản phẩm thay đổi
 
   const handleAddToCart = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Vui lòng đăng nhập để thêm vào giỏ hàng.");
+      return;
+    }
     if (product) {
       // Cập nhật addToCart, truyền 'product' và ảnh để đồng bộ với các component khác
       addToCart(product.id, 'product', quantity, product.image);

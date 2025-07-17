@@ -8,7 +8,7 @@ import { ShopContext } from "@/components/context/ShopContext";
 function Product() {
   // Xóa imageMap vì chúng ta sẽ dùng URL trực tiếp
   const { addToCart, cafes } = useContext(ShopContext);
-
+  
   return (
     <section className="relative bg-[#1a1a1a] text-white py-20 px-4">
       <div className="max-w-6xl mx-auto text-center">
@@ -33,7 +33,14 @@ function Product() {
                 <button
                   className="bg-[#A47148] text-white px-4 py-1 rounded-full hover:bg-[#D9A074] hover:text-[#3E2C24] transition duration-200 shadow"
                   // Cập nhật addToCart để truyền đủ thông tin, bao gồm cả ảnh cho giỏ hàng
-                  onClick={() => addToCart(item.id, 'cafe', 1, item.img)}
+                  onClick={() => {
+                    const token = localStorage.getItem("token");
+                    if (!token) {
+                      alert("Vui lòng đăng nhập để thêm vào giỏ hàng.");
+                      return;
+                    }
+                    addToCart(item.id, "cafe", 1, item.img);
+                  }}
                 >
                   + Thêm
                 </button>
