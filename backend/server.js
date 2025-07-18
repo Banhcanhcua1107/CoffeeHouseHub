@@ -37,17 +37,7 @@ const cloudinaryStorage = new CloudinaryStorage({
         transformation: [{ width: 500, height: 500, crop: 'limit' }]
     },
 });
-const upload = multer({ 
-  storage: new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-      folder: 'coffee_house/products',
-      allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
-      transformation: [{ width: 800, height: 800, crop: 'limit' }]
-    },
-  }),
-  limits: { fileSize: 5 * 1024 * 1024 } // Giới hạn 5MB
-});
+const upload = multer({ storage: cloudinaryStorage });
 
 
 const diskStorage = multer.diskStorage({
@@ -954,35 +944,22 @@ app.get("/cafe", async (req, res) => {
 
 app.post("/cafes", authenticateJWT, adminOnly, upload.single('img'), async (req, res) => {
     try {
-        // Multer sẽ xử lý file và đưa vào req.file, các trường text vào req.body
         const { name, price, desc } = req.body;
-
-        // Bắt buộc phải có file ảnh
-        if (!req.file) {
-            return res.status(400).json({ error: "Vui lòng cung cấp hình ảnh cho món." });
+        if (!name || !price || !req.file) {
+            return res.status(400).json({ error: "Thiếu thông tin tên, giá, hoặc hình ảnh." });
         }
-        // Bắt buộc phải có tên và giá
-        if (!name || !price) {
-            return res.status(400).json({ error: "Tên và giá là các trường bắt buộc." });
-        }
-
-        // Lấy URL ảnh sau khi Cloudinary xử lý xong
+        
+        // Lấy URL từ Cloudinary
         const imageUrl = req.file.path;
 
         const [result] = await dbPool.query(
             "INSERT INTO cafe (name, price, `desc`, img) VALUES (?, ?, ?, ?)",
-            [name, price, desc || null, imageUrl]
+            [name, price, desc, imageUrl]
         );
-        res.status(201).json({ message: "Đã thêm món mới thành công", id: result.insertId });
+        res.status(201).json({ message: "Đã thêm món mới", id: result.insertId });
     } catch (err) {
-        console.error("Lỗi khi thêm món trong /cafes:", err);
-         res.status(500).json({ 
-            error: "Lỗi server khi thêm món mới.",
-            details: err.message,
-            stack: err.stack,        // Xem ngắn gọn cũng đủ rồi
-            body: req.body,          // Thử in ra body gửi lên để debug
-            file: req.file           // Xem file nhận được có đúng không
-        });
+        console.error("Lỗi khi thêm món:", err);
+        res.status(500).json({ error: err.message });
     }
 });
 
@@ -1029,61 +1006,56 @@ app.get("/products", async (req, res) => {
 });
 
 app.post("/products", authenticateJWT, adminOnly, upload.single('image'), async (req, res) => {
-  try {
-    console.log('Request body:', req.body);
-    console.log('Uploaded file:', req.file);
+    try {
+        // Lấy tất cả các trường từ req.body
+        const { 
+            name, 
+            price, 
+            original, 
+            description, 
+            sale, 
+            short_description, 
+            sku, 
+            category, 
+            tags 
+        } = req.body;
 
-    if (!req.file) {
-      return res.status(400).json({ error: "Vui lòng cung cấp hình ảnh cho sản phẩm." });
+        // Kiểm tra các trường bắt buộc
+        if (!name || !price || !req.file) {
+            return res.status(400).json({ error: "Thiếu thông tin tên, giá, hoặc hình ảnh." });
+        }
+        
+        const imageUrl = req.file.path; // URL từ Cloudinary
+        const isSale = sale === 'true' ? 1 : 0; // Chuyển đổi giá trị 'true'/'false' thành 1/0
+
+        // Câu lệnh SQL INSERT với tất cả các cột mới
+        const sql = `
+            INSERT INTO products 
+            (name, price, original, description, image, sale, short_description, sku, category, tags) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        
+        // Mảng các giá trị tương ứng với các dấu '?'
+        const values = [
+            name, 
+            price, 
+            original || null, 
+            description, 
+            imageUrl, 
+            isSale,
+            short_description || null,
+            sku || null,
+            category || null,
+            tags || null
+        ];
+
+        const [result] = await dbPool.query(sql, values);
+        
+        res.status(201).json({ message: "Đã thêm sản phẩm mới", id: result.insertId });
+    } catch (err) {
+        console.error("Lỗi khi thêm sản phẩm:", err);
+        res.status(500).json({ error: err.message });
     }
-
-    const {
-      name,
-      price,
-      original,
-      description,
-      sale,
-      short_description,
-      sku,
-      category,
-      tags
-    } = req.body;
-
-    if (!name || !price) {
-      return res.status(400).json({ error: "Tên và giá bán là các trường bắt buộc." });
-    }
-
-    const imageUrl = req.file.path; // URL từ Cloudinary
-    const isSale = sale === 'true' ? 1 : 0;
-
-    const sql = `
-      INSERT INTO products 
-      (name, price, original, description, image, sale, short_description, sku, category, tags) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `;
-    const values = [
-      name,
-      price,
-      original || null,
-      description || null,
-      imageUrl,
-      isSale,
-      short_description || null,
-      sku || null,
-      category || null,
-      tags || null
-    ];
-
-    const [result] = await dbPool.query(sql, values);
-    res.status(201).json({ message: "Đã thêm sản phẩm mới thành công", id: result.insertId });
-  } catch (err) {
-    console.error("Lỗi chi tiết:", err);
-    res.status(500).json({ 
-      error: "Lỗi server khi thêm sản phẩm mới.",
-      details: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
-    });
-  }
 });
 app.post("/products/import", authenticateJWT, adminOnly, uploadCsv.single('file'), async (req, res) => {
     if (!req.file) {
