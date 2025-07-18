@@ -944,22 +944,29 @@ app.get("/cafe", async (req, res) => {
 
 app.post("/cafes", authenticateJWT, adminOnly, upload.single('img'), async (req, res) => {
     try {
+        // Multer sẽ xử lý file và đưa vào req.file, các trường text vào req.body
         const { name, price, desc } = req.body;
-        if (!name || !price || !req.file) {
-            return res.status(400).json({ error: "Thiếu thông tin tên, giá, hoặc hình ảnh." });
+
+        // Bắt buộc phải có file ảnh
+        if (!req.file) {
+            return res.status(400).json({ error: "Vui lòng cung cấp hình ảnh cho món." });
+        }
+        // Bắt buộc phải có tên và giá
+        if (!name || !price) {
+            return res.status(400).json({ error: "Tên và giá là các trường bắt buộc." });
         }
 
-        // Lấy URL từ Cloudinary
+        // Lấy URL ảnh sau khi Cloudinary xử lý xong
         const imageUrl = req.file.path;
 
         const [result] = await dbPool.query(
             "INSERT INTO cafe (name, price, `desc`, img) VALUES (?, ?, ?, ?)",
-            [name, price, desc, imageUrl]
+            [name, price, desc || null, imageUrl]
         );
-        res.status(201).json({ message: "Đã thêm món mới", id: result.insertId });
+        res.status(201).json({ message: "Đã thêm món mới thành công", id: result.insertId });
     } catch (err) {
-        console.error("Lỗi khi thêm món:", err);
-        res.status(500).json({ error: err.message });
+        console.error("Lỗi khi thêm món trong /cafes:", err);
+        res.status(500).json({ error: "Lỗi server khi thêm món mới.", details: err.message });
     }
 });
 app.put("/cafes/:id", authenticateJWT, adminOnly, upload.single('img'), async (req, res) => {
@@ -1006,7 +1013,7 @@ app.get("/products", async (req, res) => {
 
 app.post("/products", authenticateJWT, adminOnly, upload.single('image'), async (req, res) => {
     try {
-        // Lấy tất cả các trường từ req.body
+        // Multer đã xử lý và đưa các trường vào req.body và req.file
         const {
             name,
             price,
@@ -1019,27 +1026,28 @@ app.post("/products", authenticateJWT, adminOnly, upload.single('image'), async 
             tags
         } = req.body;
 
-        // Kiểm tra các trường bắt buộc
-        if (!name || !price || !req.file) {
-            return res.status(400).json({ error: "Thiếu thông tin tên, giá, hoặc hình ảnh." });
+        // Bắt buộc phải có file ảnh
+        if (!req.file) {
+            return res.status(400).json({ error: "Vui lòng cung cấp hình ảnh cho sản phẩm." });
+        }
+        // Bắt buộc phải có tên và giá
+        if (!name || !price) {
+            return res.status(400).json({ error: "Tên và giá bán là các trường bắt buộc." });
         }
 
         const imageUrl = req.file.path; // URL từ Cloudinary
-        const isSale = sale === 'true' ? 1 : 0; // Chuyển đổi giá trị 'true'/'false' thành 1/0
+        const isSale = sale === 'true' ? 1 : 0;
 
-        // Câu lệnh SQL INSERT với tất cả các cột mới
         const sql = `
             INSERT INTO products 
             (name, price, original, description, image, sale, short_description, sku, category, tags) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
-
-        // Mảng các giá trị tương ứng với các dấu '?'
         const values = [
             name,
             price,
             original || null,
-            description,
+            description || null,
             imageUrl,
             isSale,
             short_description || null,
@@ -1050,10 +1058,10 @@ app.post("/products", authenticateJWT, adminOnly, upload.single('image'), async 
 
         const [result] = await dbPool.query(sql, values);
 
-        res.status(201).json({ message: "Đã thêm sản phẩm mới", id: result.insertId });
+        res.status(201).json({ message: "Đã thêm sản phẩm mới thành công", id: result.insertId });
     } catch (err) {
-        console.error("Lỗi khi thêm sản phẩm:", err);
-        res.status(500).json({ error: err.message });
+        console.error("Lỗi khi thêm sản phẩm trong /products:", err);
+        res.status(500).json({ error: "Lỗi server khi thêm sản phẩm mới.", details: err.message });
     }
 });
 app.post("/products/import", authenticateJWT, adminOnly, uploadCsv.single('file'), async (req, res) => {
