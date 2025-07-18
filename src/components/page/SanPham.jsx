@@ -45,7 +45,7 @@ function SanPham() {
     formData.append('image', fileList[0].originFileObj);
     const token = localStorage.getItem('token');
     try {
-      await axios.post('https://coffeehousehub-production.up.railway.app/products', formData, { headers: { 'Authorization': `Bearer ${token}` } });
+      await axios.post('https://coffeehousehub.vercel.app/products', formData, { headers: { 'Authorization': `Bearer ${token}` } });
       message.success('Thêm sản phẩm thành công!');
       setIsAddModalVisible(false);
       addForm.resetFields();

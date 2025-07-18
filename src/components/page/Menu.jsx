@@ -42,7 +42,7 @@ function Menu() {
     formData.append('img', fileList[0].originFileObj);
     const token = localStorage.getItem('token');
     try {
-      await axios.post('https://coffeehousehub-production.up.railway.app/cafes', formData, { headers: { 'Authorization': `Bearer ${token}` } });
+      await axios.post('https://coffeehousehub.vercel.app/cafes', formData, { headers: { 'Authorization': `Bearer ${token}` } });
       message.success('Thêm món thành công!');
       setIsAddModalVisible(false);
       addForm.resetFields();

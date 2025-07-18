@@ -966,9 +966,16 @@ app.post("/cafes", authenticateJWT, adminOnly, upload.single('img'), async (req,
         res.status(201).json({ message: "Đã thêm món mới thành công", id: result.insertId });
     } catch (err) {
         console.error("Lỗi khi thêm món trong /cafes:", err);
-        res.status(500).json({ error: "Lỗi server khi thêm món mới.", details: err.message });
+         res.status(500).json({ 
+            error: "Lỗi server khi thêm món mới.",
+            details: err.message,
+            stack: err.stack,        // Xem ngắn gọn cũng đủ rồi
+            body: req.body,          // Thử in ra body gửi lên để debug
+            file: req.file           // Xem file nhận được có đúng không
+        });
     }
 });
+
 app.put("/cafes/:id", authenticateJWT, adminOnly, upload.single('img'), async (req, res) => {
     const { id } = req.params;
     const { name, price, desc } = req.body;
