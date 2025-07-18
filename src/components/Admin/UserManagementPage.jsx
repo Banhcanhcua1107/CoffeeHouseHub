@@ -91,19 +91,28 @@ const UserManagementPage = () => {
   };
 
   const handleEditSave = async () => {
-    try {
-      await axios.put(`/api/admin/users/${editingUser.id}`,
-        editForm,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      alert('Cập nhật thông tin user thành công!');
-      setEditingUser(null);
-      fetchUsers();
-    } catch (err) {
-      console.error("Lỗi khi cập nhật user:", err);
-      alert(err.response?.data?.error || "Có lỗi xảy ra.");
+  try {
+    const token = localStorage.getItem('token');
+    
+    // Thêm xác nhận nếu có thay đổi mật khẩu
+    if (editForm.password && !window.confirm('Bạn chắc chắn muốn đổi mật khẩu của người này?')) {
+      return;
     }
-  };
+
+    await axios.put(`https://coffeehousehub-production.up.railway.app/api/admin/users/${editingUser.id}`,
+      editForm,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    alert('Cập nhật thông tin user thành công!');
+    setEditingUser(null);
+    fetchUsers();
+  } catch (err) {
+    console.error("Lỗi khi cập nhật user:", err);
+    alert(err.response?.data?.error || "Có lỗi xảy ra.");
+  }
+};
+
 
   const paginate = (pageNumber) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
