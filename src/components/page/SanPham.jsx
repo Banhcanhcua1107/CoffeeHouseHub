@@ -37,23 +37,50 @@ function SanPham() {
 
   // --- HÀM THÊM MỚI SẢN PHẨM ---
   const handleAddProduct = async (values) => {
-    if (fileList.length === 0) { message.error('Vui lòng chọn hình ảnh cho sản phẩm!'); return; }
-    setLoading(true);
-    const formData = new FormData();
-    Object.keys(values).forEach(key => formData.append(key, values[key] ?? ''));
-    formData.append('sale', values.sale || false);
-    formData.append('image', fileList[0].originFileObj);
-    const token = localStorage.getItem('token');
-    try {
-      await axios.post('https://coffeehousehub-production.up.railway.app/products', formData, { headers: { 'Authorization': `Bearer ${token}` } });
-      message.success('Thêm sản phẩm thành công!');
-      setIsAddModalVisible(false);
-      addForm.resetFields();
-      setFileList([]);
-      if(fetchProducts) fetchProducts();
-    } catch (error) { message.error(error.response?.data?.error || 'Thêm sản phẩm thất bại!'); } 
-    finally { setLoading(false); }
-  };
+  if (fileList.length === 0) {
+    message.error('Vui lòng chọn hình ảnh cho sản phẩm!');
+    return;
+  }
+  
+  setLoading(true);
+  const formData = new FormData();
+  
+  // Thêm các trường dữ liệu vào formData
+  formData.append('name', values.name);
+  formData.append('price', values.price);
+  if (values.original) formData.append('original', values.original);
+  formData.append('description', values.description || '');
+  formData.append('short_description', values.short_description || '');
+  formData.append('sku', values.sku || '');
+  formData.append('category', values.category || '');
+  formData.append('tags', values.tags || '');
+  formData.append('sale', values.sale ? 'true' : 'false');
+  
+  // Thêm file ảnh
+  formData.append('image', fileList[0].originFileObj);
+  
+  const token = localStorage.getItem('token');
+  
+  try {
+    await axios.post('https://coffeehousehub-production.up.railway.app/products', formData, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+    
+    message.success('Thêm sản phẩm thành công!');
+    setIsAddModalVisible(false);
+    addForm.resetFields();
+    setFileList([]);
+    if (fetchProducts) fetchProducts();
+  } catch (error) {
+    console.error('Lỗi khi thêm sản phẩm:', error);
+    message.error(error.response?.data?.error || 'Thêm sản phẩm thất bại!');
+  } finally {
+    setLoading(false);
+  }
+};
 
   // --- HÀM CẬP NHẬT SẢN PHẨM ---
   const handleUpdateProduct = async (values) => {
@@ -236,9 +263,16 @@ function SanPham() {
                 </Form.Item>
 
                 <Form.Item label="Hình ảnh sản phẩm" required>
-                    <Upload listType="picture" fileList={fileList} onChange={({ fileList: newFileList }) => setFileList(newFileList)} beforeUpload={() => false} onRemove={() => setFileList([])}>
-                        {fileList.length < 1 && <Button icon={<UploadOutlined />}>Chọn ảnh</Button>}
-                    </Upload>
+                  <Upload 
+                    listType="picture"
+                    fileList={fileList}
+                    onChange={({ fileList: newFileList }) => setFileList(newFileList)}
+                    beforeUpload={() => false}
+                    onRemove={() => setFileList([])}
+                    accept="image/*"
+                  >
+                    {fileList.length < 1 && <Button icon={<UploadOutlined />}>Chọn ảnh</Button>}
+                  </Upload>
                 </Form.Item>
               </div>
 
