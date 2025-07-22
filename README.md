@@ -46,7 +46,7 @@ The site is designed for speed, scalability, and seamless user experience.
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/yourusername/coffeehousehub.git
+git clone https://github.com/Banhcanhcua1107/coffeehousehub.git
 cd coffeehousehub
 
 # 2. Install dependencies
@@ -101,7 +101,7 @@ This project is licensed under the MIT License.
 ---
 
 **Cách sử dụng:**
-- Thay thế `yourusername` bằng username GitHub của bạn.
+- Thay thế `Banhcanhcua1107` bằng username GitHub của bạn.
 - Thêm mô tả chi tiết hơn cho project nếu muốn.
 - Để chuyên nghiệp hơn, hãy bổ sung ảnh chụp màn hình UI ở mục **Screenshots**.
 - Nếu có thêm link GitHub repo, bạn có thể thêm ngay phía đầu file.
